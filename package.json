@@ -10,7 +10,7 @@
     "check:verbose": "node src/index.js --verbose",
     "test-alert": "node src/index.js --test-alert",
     "browsers": "playwright install --with-deps chromium",
-    "test": "node --test \"tests/*.test.js\""
+    "test": "node --test"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
