@@ -1,54 +1,53 @@
 # ---------------------------------------------------------------------------
-# Liste des articles a surveiller.
-# Remplace les exemples ci-dessous par tes vraies URLs, puis commit.
+# Pokémon — Coffret Dresseur d'Élite 30e anniversaire (EAN 196214144835)
+#
+# État relevé le 2026-09-17 : en rupture sur les trois sites surveillés.
+# Chaque site ci-dessous a été testé en conditions réelles.
 # ---------------------------------------------------------------------------
 
 settings:
-  concurrency: 4          # nombre de sites verifies en parallele
-  heartbeat_hours: 24     # message "je suis vivant" toutes les 24h (0 = desactive)
-  error_alert_after: 3    # alerte apres N echecs consecutifs sur un site
-  timeout_ms: 25000
+  concurrency: 3
+  heartbeat_hours: 24     # message "je suis vivant" toutes les 24h (0 = désactivé)
+  error_alert_after: 3    # alerte après N échecs consécutifs sur un site
+  timeout_ms: 30000
   retries: 2
 
 sites:
-  # --- Cas 1 : boutique Shopify (le plus fiable, zero configuration) ---------
-  - name: "Exemple Shopify — Sneakers"
-    url: "https://boutique-exemple.com/products/sneaker-modele-x"
-    mode: auto            # detecte tout seul l'API JSON de Shopify
-    # variant: "42"       # optionnel : ne surveiller qu'une taille/variante
-
-  # --- Cas 2 : site classique, detection automatique ------------------------
-  - name: "Exemple boutique FR — Console"
-    url: "https://autre-boutique.fr/produit/console-edition-limitee"
-    mode: auto
-    # scope: "#product-main"   # optionnel : limite l'analyse a cette zone
-
-  # --- Cas 3 : regles explicites (quand l'auto se trompe) -------------------
-  - name: "Exemple regles precises"
-    url: "https://exemple.com/article/123"
+  # Testé OK : schema.org expose OutOfStock, aucune protection anti-bot.
+  - name: "King Jouet — ETB 30 ans"
+    url: "https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034916-pokemon-30-ans-coffret-dresseur-d-elite.htm"
     mode: http
-    in_stock_when:
-      absent:
-        - "Rupture de stock"
-        - "Me prevenir par e-mail"
-      present:
-        - "Ajouter au panier"
-      # selector_exists: "button.add-to-cart:not([disabled])"
-      # selector_absent: ".out-of-stock-badge"
-      # regex: '"availability"\s*:\s*"[^"]*InStock"'
 
-  # --- Cas 4 : site rendu en JavaScript ------------------------------------
-  - name: "Exemple site JS"
-    url: "https://boutique-react.com/p/article"
+  # Testé OK : schema.org expose OutOfStock.
+  # Attention, la page affiche "Ajouter au panier" même en rupture : les données
+  # structurées font foi, ne pas remplacer par une règle sur ce texte.
+  - name: "1001hobbies — ETB 30 ans"
+    url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892561-pokemon-company-bm-258861-pokemon-30eme-anniversaire-elite-trainer-196214144835.html"
+    mode: http
+
+  # Testé : renvoie 403 en HTTP simple, mais passe en mode navigateur.
+  # schema.org y expose alors OutOfStock de façon fiable.
+  - name: "Carrefour — ETB 30 ans"
+    url: "https://www.carrefour.fr/p/cartes-a-jouer-et-a-collectionner-coffret-dresseur-d-elite-30e-anniversaire-pokemon-0196214144835"
     mode: browser
-    wait_for_selector: ".product-availability"
-    wait_ms: 3000
-    in_stock_when:
-      absent: ["Indisponible"]
-    enabled: false        # mets true quand tu l'utilises
-  # Options utiles sur chaque site :
-  #   enabled: false                -> met en pause sans supprimer
-  #   notify_on_out_of_stock: true  -> alerter aussi au retour en rupture
-  #   notify_on_first_check: false  -> ne pas alerter si deja dispo au 1er passage
-  #   headers: { Cookie: "..." }    -> en-tetes HTTP supplementaires
-  #   currency: "$"                 -> symbole affiche dans lalerte
+    wait_ms: 5000
+
+  # DÉSACTIVÉ — la Fnac sert un mur anti-bot DataDome (captcha) aussi bien en
+  # HTTP qu'en navigateur, y compris depuis une IP résidentielle. Il n'existe pas
+  # de moyen propre de la surveiller automatiquement : utilise le bouton
+  # "Alerte disponibilité" sur la page produit Fnac, qui fait le même travail.
+  - name: "Fnac — ETB 30 ans"
+    url: "https://www.fnac.com/Cartes-a-collectionner-Pokemon-30A-Coffret-Dresseur-d-Elite/a23200296/w-4"
+    mode: browser
+    enabled: false
+
+# Pour ajouter un revendeur : copie un bloc, change name + url, garde mode: http
+# et lance `npm run check:dry -- --verbose` pour voir si la détection tombe juste.
+#
+# Options utiles sur chaque site :
+#   enabled: false                -> met en pause sans supprimer
+#   notify_on_out_of_stock: true  -> alerter aussi au retour en rupture
+#   notify_on_first_check: false  -> ne pas alerter si déjà dispo au 1er passage
+#   scope: "#zone-produit"        -> limiter l'analyse à une zone de la page
+#   headers: { Cookie: "..." }    -> en-têtes HTTP supplémentaires
+#   in_stock_when: { absent: ["Rupture de stock"] }   -> règle explicite
