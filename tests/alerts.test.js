@@ -60,3 +60,33 @@ test('rappel une fois l intervalle ecoule : une panne installee ne s oublie pas'
   const { out } = run(CONFIG, siteState({ inStock: null, failures: 40, lastProblemAlert: old }));
   assert.match(out, /Surveillance en echec/);
 });
+
+test('l apercu n envoie rien sans --send', () => {
+  // Pas de secrets dans l'environnement : si l'apercu tentait un envoi, il
+  // echouerait. C'est precisement la garantie qu'on veut verrouiller.
+  const out = execFileSync(process.execPath, ['src/index.js', '--preview-alert=stock'], {
+    encoding: 'utf8',
+    env: { ...process.env, TELEGRAM_BOT_TOKEN: '', TELEGRAM_CHAT_ID: '' },
+  });
+  assert.match(out, /affichage seul/);
+  assert.match(out, /EN STOCK/);
+});
+
+test('le message de retour en stock porte l URL en clair, cliquable', () => {
+  const out = execFileSync(process.execPath, ['src/index.js', '--preview-alert=stock'], { encoding: 'utf8' });
+  assert.match(out, /https:\/\/www\.carrefour\.fr\/p\//);
+});
+
+test('une detection peu sure est signalee dans l alerte', () => {
+  const sure = execFileSync(process.execPath, ['src/index.js', '--preview-alert=stock'], { encoding: 'utf8' });
+  const doute = execFileSync(process.execPath, ['src/index.js', '--preview-alert=doute'], { encoding: 'utf8' });
+  assert.equal(sure.includes('Detection peu sure'), false);
+  assert.match(doute, /Detection peu sure/);
+});
+
+test('le marqueur DEMO est en premiere ligne, la ou l apercu du telephone le montre', () => {
+  const out = execFileSync(process.execPath, ['src/index.js', '--preview-alert=stock'], { encoding: 'utf8' });
+  const lines = out.split('\n').filter((l) => l.trim() && !l.startsWith('---'));
+  assert.match(lines[0], /DEMO/);
+  assert.equal(lines[0].includes('EN STOCK'), false);
+});

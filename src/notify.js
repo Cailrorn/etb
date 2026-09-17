@@ -46,15 +46,28 @@ export async function sendTelegram(text, { disablePreview = true, silent = false
   return false;
 }
 
+/**
+ * Message de retour en stock.
+ *
+ * C'est la seule notification ou chaque seconde compte : elle est construite
+ * pour etre lisible sur un ecran verrouille et cliquable sans rien chercher.
+ * L'essentiel tient donc sur les deux premieres lignes, que l'apercu affiche,
+ * et l'URL apparait en clair — un lien nu se touche directement, montre le
+ * marchand avant d'ouvrir, et se copie d'un appui long.
+ */
 export function backInStockMessage(site, result) {
-  const lines = [
-    '🟢 <b>DE NOUVEAU EN STOCK</b>',
-    '',
-    `<b>${escapeHtml(site.name)}</b>`,
-  ];
-  if (result.price) lines.push(`Prix : ${escapeHtml(result.price)} ${escapeHtml(site.currency ?? '€')}`);
-  lines.push(`Detecte via : ${escapeHtml(result.reason)}`);
-  lines.push('', `<a href="${escapeHtml(site.url)}">Ouvrir la page produit</a>`);
+  const lines = [`🟢 <b>EN STOCK</b> — ${escapeHtml(site.name)}`];
+
+  if (result.price) {
+    lines.push(`💶 ${escapeHtml(result.price)} ${escapeHtml(site.currency ?? '€')}`);
+  }
+
+  lines.push('', escapeHtml(site.url));
+
+  if (result.confidence && result.confidence !== 'high') {
+    lines.push('', `<i>⚠️ Detection peu sure (${escapeHtml(result.reason)}) — verifie avant d'acheter.</i>`);
+  }
+
   return lines.join('\n');
 }
 

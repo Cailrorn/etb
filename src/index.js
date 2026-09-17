@@ -23,6 +23,10 @@ const log = (...m) => console.log(...m);
 const debug = (...m) => VERBOSE && console.log('   ', ...m);
 
 async function main() {
+  // Exemple de notification : affiche par defaut, envoye avec --send.
+  const preview = value('preview-alert');
+  if (preview !== null) return previewAlert(preview, flag('send'));
+
   if (flag('test-alert')) {
     await sendTelegram('✅ <b>Test de configuration</b>\n\nLe bot est bien relie a ce salon. La surveillance peut demarrer.');
     log('Message de test envoye. Verifie Telegram.');
@@ -218,6 +222,52 @@ function problemAlertDue(prev, count, settings) {
   if (!prev.lastProblemAlert) return true;
   const repeatMs = (settings.error_repeat_hours ?? 12) * 3600_000;
   return Date.now() - new Date(prev.lastProblemAlert).getTime() >= repeatMs;
+}
+
+/**
+ * Affiche un exemple de notification, et l'envoie sur Telegram si --send.
+ *
+ * Le marqueur DEMO est place en toute premiere ligne, jamais en bas : sur un
+ * ecran verrouille, l'apercu ne montre que les premieres lignes, et c'est la
+ * qu'il faut lever le doute. Un marqueur en pied de message serait lu apres
+ * s'etre deplace chez le marchand.
+ */
+async function previewAlert(kind, send) {
+  const site = {
+    name: 'Carrefour — Coffret Poster',
+    url: 'https://www.carrefour.fr/p/exemple-de-fiche-produit',
+    currency: '€',
+  };
+  const verdict = { price: '39.99', confidence: 'high', reason: 'schema.org availability = InStock' };
+
+  const samples = {
+    stock: () => backInStockMessage(site, verdict),
+    rupture: () => outOfStockMessage(site, { reason: 'schema.org availability = OutOfStock' }),
+    echec: () => errorMessage(site, 3, 'HTTP 403 Forbidden'),
+    illisible: () => undetectableMessage(site, 3, 'Aucun signal de disponibilite reconnu'),
+    doute: () => backInStockMessage(site, { ...verdict, confidence: 'low', reason: 'Bouton panier actif' }),
+  };
+
+  const make = samples[kind];
+  if (!make) {
+    console.error(`Apercu inconnu : "${kind}". Disponibles : ${Object.keys(samples).join(', ')}`);
+    process.exitCode = 1;
+    return;
+  }
+
+  const message = [
+    '🧪 <b>DEMO — ceci n\'est pas une vraie alerte</b>',
+    '➖➖➖➖➖➖➖➖➖➖',
+    make(),
+  ].join('\n');
+
+  log(`--- apercu "${kind}"${send ? ' (envoi Telegram)' : ' (affichage seul)'} ---`);
+  log(message.replace(/<[^>]+>/g, ''));
+
+  if (send) {
+    await sendTelegram(message);
+    log('\nEnvoye sur Telegram, marque DEMO.');
+  }
 }
 
 async function withRetries(site, fn) {

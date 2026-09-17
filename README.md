@@ -161,7 +161,9 @@ settings:
 npm install
 npm run check:dry        # vérifie sans envoyer d'alerte — à utiliser pour régler un site
 npm run check:verbose    # affiche la source et le motif de chaque décision
-npm test                 # suite de tests de la détection
+npm test                 # suite de tests
+npm run preview          # voir un exemple d'alerte (affichage seul)
+npm run preview:send     # l'envoyer sur Telegram, marqué DEMO en première ligne
 node src/index.js --only=mon-article --dry-run --verbose   # un seul site
 ```
 
