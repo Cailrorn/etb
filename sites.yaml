@@ -1,8 +1,9 @@
 # ---------------------------------------------------------------------------
-# Pokémon 30e anniversaire — trois articles surveillés :
+# Pokémon 30e anniversaire — quatre articles surveillés :
 #   · Coffret Dresseur d'Élite   (ETB)       EAN 196214144835
 #   · Coffret Collection Poster  (Poster)    EAN 196214147225
 #   · Coffret 4 boosters Nymphali-ex         EAN 196214147102
+#   · Coffret 4 boosters Amphinobi-ex        EAN 196214147164
 #
 # État relevé le 2026-09-18 : tout en rupture chez tous les revendeurs.
 # Chaque lien a été testé en conditions réelles, et vérifié comme pointant bien
@@ -111,6 +112,29 @@ sites:
 
   - name: "Carrefour — Coffret Nymphali"
     url: "https://www.carrefour.fr/p/coffret-pokemon-nymphali-ex-30e-anniversaire-pokemon-0196214147102"
+    mode: browser
+    wait_ms: 8000
+    challenge_timeout_ms: 30000
+
+  # -------------------------------------------------------------------------
+  # Coffret 4 boosters Amphinobi-ex — EAN 196214147164
+  # Les quatre liens testés le 2026-09-18 : bon produit, bon EAN, en rupture.
+  # -------------------------------------------------------------------------
+
+  - name: "1001hobbies — Coffret Amphinobi"
+    url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892559-pokemon-company-bm-258857-pokemon-30eme-anniversaire-coffret-amphi-196214147164.html"
+    mode: http
+
+  - name: "JouéClub — Coffret Amphinobi"
+    url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-amphinobi-ex-0196214147164.html"
+    mode: http
+
+  - name: "La Grande Récré — Coffret Amphinobi"
+    url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-4-boosters-amphinobi-ex-pokemon-30e-anniversaire.html"
+    mode: http
+
+  - name: "Carrefour — Coffret Amphinobi"
+    url: "https://www.carrefour.fr/p/coffret-pokemon-amphinobi-ex-30e-anniversaire-pokemon-0196214147164"
     mode: browser
     wait_ms: 8000
     challenge_timeout_ms: 30000
