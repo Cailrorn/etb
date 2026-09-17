@@ -56,7 +56,7 @@ async function main() {
       // On n'alerte qu'a partir du seuil, et une seule fois, pour ne pas spammer
       // sur une coupure reseau passagere.
       if (failures === config.settings.error_alert_after) {
-        alerts.push(errorMessage(site, failures, err.message));
+        alerts.push({ id: site.id, prev, message: errorMessage(site, failures, err.message) });
       }
       return;
     }
@@ -74,11 +74,11 @@ async function main() {
       // Premiere observation : on n'alerte que si l'article est reellement dispo,
       // sinon chaque nouveau site declencherait une notification au demarrage.
       if (prev.inStock !== null || site.notify_on_first_check !== false) {
-        alerts.push(backInStockMessage(site, verdict));
+        alerts.push({ id: site.id, prev, message: backInStockMessage(site, verdict) });
       }
     }
     if (changed && verdict.inStock === false && prev.inStock === true && site.notify_on_out_of_stock) {
-      alerts.push(outOfStockMessage(site, verdict));
+      alerts.push({ id: site.id, prev, message: outOfStockMessage(site, verdict) });
     }
 
     state.sites[site.id] = {
@@ -94,8 +94,9 @@ async function main() {
   });
 
   const hb = config.settings.heartbeat_hours;
+  const previousHeartbeat = state.lastHeartbeat;
   if (hb > 0 && isDue(state.lastHeartbeat, hb)) {
-    alerts.push(heartbeatMessage(sites, results));
+    alerts.push({ id: null, message: heartbeatMessage(sites, results) });
     state.lastHeartbeat = nowIso();
   }
 
@@ -103,15 +104,46 @@ async function main() {
     log('\nAucun changement.');
   } else if (DRY_RUN) {
     log(`\n[dry-run] ${alerts.length} alerte(s) qui auraient ete envoyees :\n`);
-    alerts.forEach((a) => log(`${a.replace(/<[^>]+>/g, '')}\n---`));
+    alerts.forEach((a) => log(`${a.message.replace(/<[^>]+>/g, '')}\n---`));
   } else {
-    for (const message of alerts) {
-      await sendTelegram(message, { silent: message.startsWith('💓') });
-    }
-    log(`\n${alerts.length} alerte(s) envoyee(s) sur Telegram.`);
+    await deliver(alerts, state, previousHeartbeat);
   }
 
+  // L'etat est toujours ecrit, meme si Telegram est tombe : sinon une panne de
+  // notification ferait perdre le resultat de toute la verification.
   saveState(state, STATE_PATH);
+}
+
+/**
+ * Envoie les alertes une par une.
+ * Si l'envoi echoue, l'etat du site concerne est remis a sa valeur precedente :
+ * le changement sera redetecte au prochain passage et l'alerte rejouee. Sans
+ * cela, une panne de Telegram ferait manquer definitivement un retour en stock.
+ */
+async function deliver(alerts, state, previousHeartbeat) {
+  let sent = 0;
+  const failed = [];
+
+  for (const alert of alerts) {
+    try {
+      await sendTelegram(alert.message, { silent: alert.message.startsWith('💓') });
+      sent++;
+    } catch (err) {
+      failed.push(err.message);
+      if (alert.id) {
+        state.sites[alert.id] = alert.prev;
+      } else {
+        state.lastHeartbeat = previousHeartbeat;
+      }
+    }
+  }
+
+  if (sent > 0) log(`\n${sent} alerte(s) envoyee(s) sur Telegram.`);
+  if (failed.length > 0) {
+    console.error(`\n${failed.length} alerte(s) non remise(s) — elles seront rejouees au prochain passage.`);
+    console.error(`Cause : ${failed[0]}`);
+    process.exitCode = 1;
+  }
 }
 
 async function withRetries(site, fn) {
