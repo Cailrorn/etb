@@ -157,3 +157,21 @@ test('un mot ne matche pas au milieu d un autre', () => {
   // une recherche de sous-chaine s y laisserait prendre.
   assert.equal(heur('<p>Rayon destockage et antistock</p>').inStock, null);
 });
+
+test('isChallengePage reconnait le mur Imperva/Distil', () => {
+  const distil = '<html><head><title>Pardon Our Interruption</title></head><body>' +
+    'As you were browsing something about your browser made us think you were a bot.</body></html>';
+  assert.equal(isChallengePage(distil), true);
+});
+
+test('isChallengePage reconnait le mur Incapsula', () => {
+  const incapsula = '<html><body><iframe src="/_Incapsula_Resource?x=1">' +
+    'Request unsuccessful. Incapsula incident ID: 98500042111</iframe></body></html>';
+  assert.equal(isChallengePage(incapsula), true);
+});
+
+test('visibleTextLength ignore scripts et balises', async () => {
+  const { visibleTextLength } = await import('../src/fetchers.js');
+  assert.equal(visibleTextLength('<html><head><script>var a=1</script></head><body></body></html>'), 0);
+  assert.ok(visibleTextLength(`<body><h1>Coffret</h1><p>${'texte '.repeat(60)}</p></body>`) > 200);
+});

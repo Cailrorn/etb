@@ -162,6 +162,39 @@ sites:
       present: ["Ajouter au panier"]
       absent: ["Prévenez-moi lorsque le produit est disponible"]
 
+  # -------------------------------------------------------------------------
+  # Smyths Toys — DÉSACTIVÉ, mur anti-bot Imperva / Incapsula
+  #
+  # Testé le 2026-09-18 depuis une IP résidentielle : en HTTP simple le site
+  # renvoie "Pardon Our Interruption", et en mode navigateur une page vide
+  # portant "Request unsuccessful. Incapsula incident ID". Aucune évolution
+  # après 30 s d'attente : ce n'est pas un challenge qui se résout, c'est un
+  # refus. Comme la Fnac, pas de moyen propre de surveiller ce marchand.
+  #
+  # Les entrées sont conservées ici : si Smyths assouplit sa protection, il
+  # suffira de repasser enabled à true et de relancer un test.
+  # -------------------------------------------------------------------------
+
+  - name: "Smyths — ETB 30 ans"
+    url: "https://www.smythstoys.com/fr/fr-fr/jouets/jeux-de-societe-et-puzzles/cartes-a-collectionner/cartes-pokemon/pokemon-coffret-dresseur-delite-30eme-anniversaire/p/261821"
+    mode: browser
+    enabled: false
+
+  - name: "Smyths — Coffret Poster"
+    url: "https://www.smythstoys.com/fr/fr-fr/jouets/jeux-de-societe-et-puzzles/cartes-a-collectionner/cartes-pokemon/pokemon-coffret-collection-poster-30eme-anniversaire/p/261814"
+    mode: browser
+    enabled: false
+
+  - name: "Smyths — Coffret Nymphali"
+    url: "https://www.smythstoys.com/fr/fr-fr/jouets/jeux-de-societe-et-puzzles/cartes-a-collectionner/cartes-pokemon/pokemon-coffret-nymphali-ex-30eme-anniversaire/p/261788"
+    mode: browser
+    enabled: false
+
+  - name: "Smyths — Coffret Amphinobi"
+    url: "https://www.smythstoys.com/fr/fr-fr/jouets/jeux-de-societe-et-puzzles/cartes-a-collectionner/cartes-pokemon/pokemon-coffret-amphinobi-ex-30eme-anniversaire/p/261830"
+    mode: browser
+    enabled: false
+
 # Pour ajouter un revendeur : copie un bloc, change name + url, garde mode: http
 # et lance `npm run check:dry -- --verbose` pour voir si la détection tombe juste.
 #

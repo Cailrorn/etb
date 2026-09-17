@@ -175,6 +175,17 @@ export async function fetchBrowser(site) {
       );
     }
 
+    // Filet generique : les murs anti-bot se renouvellent et ne peuvent pas
+    // tous etre reconnus nommement. Une page rendue sans contenu n'est jamais
+    // une fiche produit valide ; mieux vaut un echec explicite qu'un
+    // "indetermine" silencieux qui laisserait l'article sans surveillance.
+    if (visibleTextLength(html) < 200) {
+      throw new Error(
+        `Page vide apres rendu (${visibleTextLength(html)} caracteres visibles). ` +
+        'Blocage probable, ou selecteur d attente mal choisi.'
+      );
+    }
+
     return { html, source: 'browser' };
   } finally {
     // On ferme le contexte, jamais le navigateur : il sert aux autres sites.
@@ -217,7 +228,7 @@ const hasUsableSignal = (html) =>
  * que l'une aboutit plutot que d'attendre un delai fixe calibre sur le pire cas.
  */
 async function waitForSignal(page, { maxMs, challengeMs, pollMs = 250 }) {
-  let html = await page.content();
+  let html = await readContent(page);
   const start = Date.now();
 
   while (true) {
@@ -229,7 +240,20 @@ async function waitForSignal(page, { maxMs, challengeMs, pollMs = 250 }) {
     if (Date.now() - start >= budget) return html;
 
     await page.waitForTimeout(pollMs);
-    html = await page.content();
+    html = await readContent(page);
+  }
+}
+
+/**
+ * Lit le HTML courant en tolerant une navigation en cours.
+ * Les pages anti-bot se redirigent d'elles-memes : lire pendant la bascule
+ * leve une erreur Playwright qui n'a rien a dire a l'utilisateur.
+ */
+async function readContent(page) {
+  try {
+    return await page.content();
+  } catch {
+    return '';
   }
 }
 
@@ -240,6 +264,9 @@ const CHALLENGE_MARKERS = [
   'checking your browser', 'verification de votre navigateur',
   'enable javascript and cookies to continue',
   'geo.captcha-delivery.com', 'cf-challenge', 'cf_chl_opt', '__cf_chl',
+  // Imperva / Distil / Incapsula : pages servies par Smyths Toys.
+  'made us think you were a bot', 'distil_r_blocked', 'distil_referrer',
+  'incapsula incident id', '_incapsula_resource', 'request unsuccessful',
 ];
 
 // Titres de pages d'attente. Compares au <title> entier et non au corps :
@@ -247,7 +274,7 @@ const CHALLENGE_MARKERS = [
 const CHALLENGE_TITLES = [
   'un instant', 'just a moment', 'acces bloque', 'attention required',
   'veuillez patienter', 'please wait', 'access denied', 'acces refuse',
-  'security check', 'verification', 'maintenance',
+  'security check', 'verification', 'maintenance', 'pardon our interruption',
 ];
 
 const stripAccents = (s) =>
@@ -270,6 +297,16 @@ export function isChallengePage(html) {
     .replace(/\s+/g, ' ')
     .trim();
   return title.length > 0 && CHALLENGE_TITLES.includes(title);
+}
+
+/** Longueur du texte reellement visible, hors balises, scripts et styles. */
+export function visibleTextLength(html) {
+  return String(html ?? '')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim().length;
 }
 
 /** Heuristique : page quasi vide cote HTML => l'appli est rendue cote client. */
