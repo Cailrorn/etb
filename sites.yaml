@@ -183,11 +183,15 @@ sites:
   # seuls des spécialistes ont ouvert des pages produit.
   # -------------------------------------------------------------------------
 
-  # Boutique Shopify : disponibilité lue directement dans l'API, sans scraping.
-  # En précommande ouverte au 2026-09-18, à 49,99 €.
+  # DÉSACTIVÉ — marchand non fiable, ne pas y commander.
+  # Techniquement surveillable (Shopify), mais retiré volontairement le
+  # 2026-09-18 : aucun SIRET, SIREN ni RCS dans ses pages légales, ce qui est
+  # obligatoire pour un site marchand visant la France, et le domaine est
+  # signalé comme frauduleux par Pokescam. Une alerte 🟢 pousserait à l'achat.
   - name: "Pokekhlass — Bundle 6 boosters"
     url: "https://pokekhlass.com/products/bundle-pokemon-30eme-anniversaire-francais"
     mode: shopify
+    enabled: false
 
   # DestockTCG expose schema.org PreOrder, ce qui ne dit pas si l'article est
   # commandable : la page annonce "Prévenez-moi de l'ouverture des précommandes".
