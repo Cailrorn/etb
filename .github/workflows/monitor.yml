@@ -1,0 +1,73 @@
+name: Surveillance stock
+
+on:
+  schedule:
+    # Toutes les 5 minutes. GitHub peut differer l'execution aux heures de pointe.
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Verifier sans envoyer d'alerte"
+        type: boolean
+        default: false
+
+concurrency:
+  group: stock-watcher
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      # Chromium n'est installe que si au moins un site en a besoin.
+      - name: Detecter le besoin d'un navigateur
+        id: browser
+        run: |
+          if grep -qE '^\s*mode:\s*browser' sites.yaml; then
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Cache des navigateurs Playwright
+        if: steps.browser.outputs.needed == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Installer Chromium
+        if: steps.browser.outputs.needed == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Verifier la disponibilite
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node src/index.js ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: Sauvegarder l'etat
+        if: always()
+        run: |
+          if [[ -n "$(git status --porcelain state.json)" ]]; then
+            git config user.name "stock-watcher"
+            git config user.email "actions@github.com"
+            git add state.json
+            git commit -m "chore: mise a jour de l'etat [skip ci]"
+            # Le cron peut chevaucher un autre run : on rejoue par-dessus la branche distante.
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            git push
+          fi

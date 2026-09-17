@@ -1,0 +1,54 @@
+# ---------------------------------------------------------------------------
+# Liste des articles a surveiller.
+# Remplace les exemples ci-dessous par tes vraies URLs, puis commit.
+# ---------------------------------------------------------------------------
+
+settings:
+  concurrency: 4          # nombre de sites verifies en parallele
+  heartbeat_hours: 24     # message "je suis vivant" toutes les 24h (0 = desactive)
+  error_alert_after: 3    # alerte apres N echecs consecutifs sur un site
+  timeout_ms: 25000
+  retries: 2
+
+sites:
+  # --- Cas 1 : boutique Shopify (le plus fiable, zero configuration) ---------
+  - name: "Exemple Shopify — Sneakers"
+    url: "https://boutique-exemple.com/products/sneaker-modele-x"
+    mode: auto            # detecte tout seul l'API JSON de Shopify
+    # variant: "42"       # optionnel : ne surveiller qu'une taille/variante
+
+  # --- Cas 2 : site classique, detection automatique ------------------------
+  - name: "Exemple boutique FR — Console"
+    url: "https://autre-boutique.fr/produit/console-edition-limitee"
+    mode: auto
+    # scope: "#product-main"   # optionnel : limite l'analyse a cette zone
+
+  # --- Cas 3 : regles explicites (quand l'auto se trompe) -------------------
+  - name: "Exemple regles precises"
+    url: "https://exemple.com/article/123"
+    mode: http
+    in_stock_when:
+      absent:
+        - "Rupture de stock"
+        - "Me prevenir par e-mail"
+      present:
+        - "Ajouter au panier"
+      # selector_exists: "button.add-to-cart:not([disabled])"
+      # selector_absent: ".out-of-stock-badge"
+      # regex: '"availability"\s*:\s*"[^"]*InStock"'
+
+  # --- Cas 4 : site rendu en JavaScript ------------------------------------
+  - name: "Exemple site JS"
+    url: "https://boutique-react.com/p/article"
+    mode: browser
+    wait_for_selector: ".product-availability"
+    wait_ms: 3000
+    in_stock_when:
+      absent: ["Indisponible"]
+    enabled: false        # mets true quand tu l'utilises
+  # Options utiles sur chaque site :
+  #   enabled: false                -> met en pause sans supprimer
+  #   notify_on_out_of_stock: true  -> alerter aussi au retour en rupture
+  #   notify_on_first_check: false  -> ne pas alerter si deja dispo au 1er passage
+  #   headers: { Cookie: "..." }    -> en-tetes HTTP supplementaires
+  #   currency: "$"                 -> symbole affiche dans lalerte
