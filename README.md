@@ -48,6 +48,7 @@ Dans le dépôt : **Settings → Secrets and variables → Actions → New repos
 |---|---|
 | `TELEGRAM_BOT_TOKEN` | le token de BotFather |
 | `TELEGRAM_CHAT_ID` | ton chat_id |
+| `HEALTHCHECK_URL` | *(optionnel)* URL de ping healthchecks.io — voir « Détecter que le robot ne tourne plus » |
 
 Puis, dans l'onglet **Actions**, active les workflows si GitHub le demande.
 
@@ -189,6 +190,38 @@ cron GitHub Actions (toutes les 5 min)
 ```
 
 `state.json` est commité automatiquement par le workflow : c'est la mémoire entre deux exécutions, et il te sert aussi d'historique (`git log state.json` montre chaque changement de stock).
+
+## Quand le bot t'écrit
+
+| Message | Déclencheur | Répétition |
+|---|---|---|
+| 🟢 **De nouveau en stock** | un article passe de rupture à disponible | à chaque retour en stock |
+| ⚠️ **Surveillance en échec** | 3 échecs réseau consécutifs sur un site | puis rappel toutes les 12 h tant que ça dure |
+| 🟠 **Site illisible** | 3 verdicts « indéterminé » consécutifs | puis rappel toutes les 12 h |
+| 🔥 **Le robot a planté** | le job GitHub échoue avant de pouvoir vérifier | à chaque échec |
+| 💓 **Surveillance active** | toutes les 24 h, en silencieux | 1×/jour |
+| 🔴 **De nouveau indisponible** | retour en rupture | désactivé par défaut |
+
+Les alertes produit ne partent qu'aux **changements d'état** : tant que tout reste en rupture, aucun message.
+
+### Détecter que le robot ne tourne plus
+
+Les cinq premiers messages supposent que le job s'exécute. Si GitHub Actions s'arrête — cron désactivé après 60 jours d'inactivité, dépôt suspendu, panne — **personne ne prévient**, et le silence ressemble exactement à « rien n'est en stock ». Un programme mort ne peut pas signaler sa propre mort : il faut un observateur extérieur.
+
+C'est le rôle de `HEALTHCHECK_URL`. À chaque passage réussi, le script appelle une URL ; si les appels cessent, le service extérieur t'alerte.
+
+**Mise en place (gratuit, 5 minutes) :**
+
+1. Crée un compte sur [healthchecks.io](https://healthchecks.io) (20 checks gratuits, pas de carte)
+2. **Add Check** → nomme-le `stock-watcher`
+3. Règle **Period** sur `15 minutes` et **Grace Time** sur `20 minutes` — assez large pour absorber les retards du cron GitHub
+4. Copie l'**URL de ping** (`https://hc-ping.com/xxxxxxxx-...`)
+5. Ajoute-la en secret GitHub sous le nom `HEALTHCHECK_URL`
+6. Dans healthchecks.io, onglet **Integrations**, branche **Telegram** (ou e-mail)
+
+Sans ce secret, tout fonctionne à l'identique — tu perds seulement la détection d'arrêt complet.
+
+Le script ne pingue **pas** quand un envoi Telegram a échoué. Le watchdog sert alors de second canal : si Telegram tombe, c'est healthchecks.io qui te prévient.
 
 ## Sites actuellement surveillés
 

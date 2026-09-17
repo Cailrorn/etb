@@ -13,6 +13,7 @@ settings:
   concurrency: 4
   heartbeat_hours: 24     # message "je suis vivant" toutes les 24h (0 = désactivé)
   error_alert_after: 3    # alerte après N échecs consécutifs sur un site
+  error_repeat_hours: 12  # puis rappel toutes les N heures tant que ça dure
   timeout_ms: 30000
   retries: 2
 

@@ -51,14 +51,23 @@ async function main() {
       result = await withRetries(site, () => fetchSite(site));
     } catch (err) {
       const failures = prev.failures + 1;
-      state.sites[site.id] = { ...prev, failures, lastError: String(err.message), lastCheck: nowIso() };
       log(`⚠️  ${site.name} — echec (${failures}) : ${err.message}`);
 
-      // On n'alerte qu'a partir du seuil, et une seule fois, pour ne pas spammer
-      // sur une coupure reseau passagere.
-      if (failures === config.settings.error_alert_after) {
+      // On laisse passer les coupures breves, puis on alerte et on rappelle
+      // regulierement tant que le site reste casse : une alerte unique se
+      // perdrait dans l'historique et le site resterait aveugle sans le dire.
+      const due = problemAlertDue(prev, failures, config.settings);
+      if (due) {
         alerts.push({ id: site.id, prev, message: errorMessage(site, failures, err.message) });
       }
+
+      state.sites[site.id] = {
+        ...prev,
+        failures,
+        lastError: String(err.message),
+        lastCheck: nowIso(),
+        lastProblemAlert: due ? nowIso() : prev.lastProblemAlert ?? null,
+      };
       return;
     }
 
@@ -85,7 +94,8 @@ async function main() {
     // Un verdict "indetermine" ne casse rien et n'alerte rien : c'est un angle
     // mort. On le compte pour finir par le signaler, comme une panne.
     const unknowns = verdict.inStock === null ? (prev.unknowns ?? 0) + 1 : 0;
-    if (unknowns === config.settings.error_alert_after) {
+    const due = unknowns > 0 && problemAlertDue(prev, unknowns, config.settings);
+    if (due) {
       alerts.push({ id: site.id, prev, message: undetectableMessage(site, unknowns, verdict.reason) });
     }
 
@@ -98,6 +108,7 @@ async function main() {
       lastCheck: nowIso(),
       lastReason: verdict.reason,
       confidence: verdict.confidence,
+      lastProblemAlert: due ? nowIso() : unknowns > 0 ? prev.lastProblemAlert ?? null : null,
       url: site.url,
     };
   });
@@ -121,6 +132,33 @@ async function main() {
   // L'etat est toujours ecrit, meme si Telegram est tombe : sinon une panne de
   // notification ferait perdre le resultat de toute la verification.
   saveState(state, STATE_PATH);
+
+  if (!DRY_RUN) await pingWatchdog(process.exitCode === 1 ? 'fail' : 'success');
+}
+
+/**
+ * Signale au service de surveillance externe que ce passage a eu lieu.
+ *
+ * C'est le seul mecanisme capable de detecter que le robot ne tourne plus du
+ * tout : un programme mort ne peut pas prevenir de sa propre mort. Si les pings
+ * cessent, c'est le service externe qui alerte. On ne pingue pas en cas
+ * d'echec, pour que ce service serve aussi de second canal si Telegram tombe.
+ */
+async function pingWatchdog(outcome) {
+  const url = process.env.HEALTHCHECK_URL;
+  if (!url) return;
+
+  const target = outcome === 'fail' ? `${url.replace(/\/+$/, '')}/fail` : url;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10000);
+    await fetch(target, { method: 'POST', signal: ctrl.signal }).finally(() => clearTimeout(timer));
+    debug(`watchdog pingue (${outcome})`);
+  } catch (err) {
+    // Un watchdog injoignable ne doit jamais faire echouer une verification
+    // par ailleurs reussie.
+    console.error(`Watchdog injoignable : ${err.message}`);
+  }
 }
 
 /**
@@ -153,6 +191,19 @@ async function deliver(alerts, state, previousHeartbeat) {
     console.error(`Cause : ${failed[0]}`);
     process.exitCode = 1;
   }
+}
+
+/**
+ * Faut-il (re)signaler qu'un site est en panne ?
+ * Oui au franchissement du seuil, puis a intervalle regulier tant que dure le
+ * probleme. Sinon une panne installee ne serait signalee qu'une fois, le
+ * premier jour, et passerait ensuite inapercue.
+ */
+function problemAlertDue(prev, count, settings) {
+  if (count < settings.error_alert_after) return false;
+  if (!prev.lastProblemAlert) return true;
+  const repeatMs = (settings.error_repeat_hours ?? 12) * 3600_000;
+  return Date.now() - new Date(prev.lastProblemAlert).getTime() >= repeatMs;
 }
 
 async function withRetries(site, fn) {
