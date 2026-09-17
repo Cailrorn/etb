@@ -1,7 +1,8 @@
 # ---------------------------------------------------------------------------
-# Pokémon 30e anniversaire — deux articles surveillés :
-#   · Coffret Dresseur d'Élite  (ETB)     EAN 196214144835
-#   · Coffret Collection Poster (Poster)  EAN 196214147225
+# Pokémon 30e anniversaire — trois articles surveillés :
+#   · Coffret Dresseur d'Élite   (ETB)       EAN 196214144835
+#   · Coffret Collection Poster  (Poster)    EAN 196214147225
+#   · Coffret 4 boosters Nymphali-ex         EAN 196214147102
 #
 # État relevé le 2026-09-18 : tout en rupture chez tous les revendeurs.
 # Chaque lien a été testé en conditions réelles, et vérifié comme pointant bien
@@ -30,11 +31,9 @@ sites:
     url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892561-pokemon-company-bm-258861-pokemon-30eme-anniversaire-elite-trainer-196214144835.html"
     mode: http
 
-  # Testé : renvoie 403 en HTTP simple, mais passe en mode navigateur.
-  # schema.org y expose alors OutOfStock de façon fiable.
-  # Testé : 403 en HTTP simple, OK en navigateur depuis une IP résidentielle.
-  # Depuis les runners GitHub, Cloudflare sert son challenge anti-bot : on lui
-  # laisse jusqu'à 30 s pour se résoudre seul avant de déclarer l'échec.
+  # Testé : 403 en HTTP simple, OK en mode navigateur, où schema.org expose
+  # OutOfStock de façon fiable. Depuis les runners GitHub, Cloudflare sert son
+  # challenge anti-bot : on lui laisse 30 s pour se résoudre seul avant d'échouer.
   - name: "Carrefour — ETB 30 ans"
     url: "https://www.carrefour.fr/p/cartes-a-jouer-et-a-collectionner-coffret-dresseur-d-elite-30e-anniversaire-pokemon-0196214144835"
     mode: browser
@@ -89,6 +88,29 @@ sites:
 
   - name: "Carrefour — Coffret Poster"
     url: "https://www.carrefour.fr/p/coffret-pokemon-collection-poster-30e-anniversaire-pokemon-0196214147225"
+    mode: browser
+    wait_ms: 8000
+    challenge_timeout_ms: 30000
+
+  # -------------------------------------------------------------------------
+  # Coffret 4 boosters Nymphali-ex — EAN 196214147102
+  # Les quatre liens testés le 2026-09-18 : bon produit, bon EAN, en rupture.
+  # -------------------------------------------------------------------------
+
+  - name: "1001hobbies — Coffret Nymphali"
+    url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892558-pokemon-company-bm-258858-pokemon-30eme-anniversaire-coffret-nymph-196214147102.html"
+    mode: http
+
+  - name: "JouéClub — Coffret Nymphali"
+    url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-nymphali-ex-0196214147102.html"
+    mode: http
+
+  - name: "La Grande Récré — Coffret Nymphali"
+    url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-4-boosters-nymphali-ex-pokemon-30e-anniversaire.html"
+    mode: http
+
+  - name: "Carrefour — Coffret Nymphali"
+    url: "https://www.carrefour.fr/p/coffret-pokemon-nymphali-ex-30e-anniversaire-pokemon-0196214147102"
     mode: browser
     wait_ms: 8000
     challenge_timeout_ms: 30000
