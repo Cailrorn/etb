@@ -5,6 +5,7 @@ import { detect } from './detect.js';
 import { loadState, saveState, siteState } from './state.js';
 import {
   sendTelegram, backInStockMessage, outOfStockMessage, errorMessage, heartbeatMessage,
+  undetectableMessage,
 } from './notify.js';
 
 const args = new Set(process.argv.slice(2));
@@ -81,10 +82,18 @@ async function main() {
       alerts.push({ id: site.id, prev, message: outOfStockMessage(site, verdict) });
     }
 
+    // Un verdict "indetermine" ne casse rien et n'alerte rien : c'est un angle
+    // mort. On le compte pour finir par le signaler, comme une panne.
+    const unknowns = verdict.inStock === null ? (prev.unknowns ?? 0) + 1 : 0;
+    if (unknowns === config.settings.error_alert_after) {
+      alerts.push({ id: site.id, prev, message: undetectableMessage(site, unknowns, verdict.reason) });
+    }
+
     state.sites[site.id] = {
       inStock: verdict.inStock,
       since: changed || !prev.since ? nowIso() : prev.since,
       failures: 0,
+      unknowns,
       lastError: null,
       lastCheck: nowIso(),
       lastReason: verdict.reason,

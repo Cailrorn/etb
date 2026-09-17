@@ -28,10 +28,14 @@ sites:
 
   # Testé : renvoie 403 en HTTP simple, mais passe en mode navigateur.
   # schema.org y expose alors OutOfStock de façon fiable.
+  # Testé : 403 en HTTP simple, OK en navigateur depuis une IP résidentielle.
+  # Depuis les runners GitHub, Cloudflare sert son challenge anti-bot : on lui
+  # laisse jusqu'à 30 s pour se résoudre seul avant de déclarer l'échec.
   - name: "Carrefour — ETB 30 ans"
     url: "https://www.carrefour.fr/p/cartes-a-jouer-et-a-collectionner-coffret-dresseur-d-elite-30e-anniversaire-pokemon-0196214144835"
     mode: browser
-    wait_ms: 5000
+    wait_ms: 8000
+    challenge_timeout_ms: 30000
 
   # Testé OK : schema.org expose OutOfStock, aucune protection.
   - name: "JouéClub — ETB 30 ans"
@@ -43,6 +47,7 @@ sites:
     url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-dresseur-d-elite-pokemon-30e-anniversaire.html"
     mode: http
 
+  # Validé depuis GitHub : fonctionne aussi depuis les IP de datacenter.
   # Testé : en HTTP simple, Cdiscount renvoie une page "activez JavaScript".
   # Pas de captcha, juste un rendu client : le mode navigateur suffit.
   # La page rendue affiche "Actuellement indisponible", cohérent avec schema.org.

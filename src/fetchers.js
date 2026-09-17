@@ -128,7 +128,26 @@ export async function fetchBrowser(site) {
     }
     await page.waitForTimeout(site.wait_ms ?? 2000);
 
-    const html = await page.content();
+    // Certains sites (Carrefour) affichent d'abord un challenge Cloudflare que le
+    // navigateur resout seul en quelques secondes. On patiente plutot que de lire
+    // la page d'attente et de conclure a tort.
+    let html = await page.content();
+    if (isChallengePage(html)) {
+      const deadline = Date.now() + (site.challenge_timeout_ms ?? 25000);
+      while (Date.now() < deadline) {
+        await page.waitForTimeout(2000);
+        html = await page.content();
+        if (!isChallengePage(html)) break;
+      }
+    }
+
+    if (isChallengePage(html)) {
+      throw new Error(
+        'Challenge anti-bot non resolu (page de verification affichee). ' +
+        'Ce site refuse probablement les IP de datacenter.'
+      );
+    }
+
     return { html, source: 'browser' };
   } finally {
     await browser.close();
@@ -156,6 +175,26 @@ export async function fetchSite(site) {
       throw err;
     });
   }
+}
+
+const CHALLENGE_MARKERS = [
+  'vous n’etes pas un robot', "vous n'etes pas un robot", 'verifions ensemble',
+  'just a moment', 'checking your browser', 'enable javascript and cookies to continue',
+  'geo.captcha-delivery.com', 'cf-challenge', 'cf_chl_opt', '__cf_chl',
+];
+
+/**
+ * Reconnait une page d'attente anti-bot plutot qu'un vrai contenu.
+ * Distinguer ce cas d'un "aucun signal trouve" evite qu'un site bloque passe
+ * pour un site simplement illisible, et silencieux de surcroit.
+ */
+export function isChallengePage(html) {
+  if (!html) return false;
+  const haystack = String(html)
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase();
+  return CHALLENGE_MARKERS.some((m) => haystack.includes(m));
 }
 
 /** Heuristique : page quasi vide cote HTML => l'appli est rendue cote client. */

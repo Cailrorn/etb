@@ -93,3 +93,16 @@ export function heartbeatMessage(sites, results) {
 }
 
 export { escapeHtml };
+
+export function undetectableMessage(site, count, reason) {
+  return [
+    '🟠 <b>Site illisible</b>',
+    '',
+    `<b>${escapeHtml(site.name)}</b>`,
+    `La page se charge mais la disponibilite n'est pas detectable (${count} passages).`,
+    `Motif : ${escapeHtml(reason)}`,
+    '',
+    'Ce site ne te previendra pas d\'un retour en stock tant que ce n\'est pas corrige.',
+    `<a href="${escapeHtml(site.url)}">Verifier la page manuellement</a>`,
+  ].join('\n');
+}

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { detect } from '../src/detect.js';
-import { selectVariants } from '../src/fetchers.js';
+import { selectVariants, isChallengePage } from '../src/fetchers.js';
 
 const page = (body) => ({ html: `<html><body>${body}</body></html>` });
 const site = (extra = {}) => ({ url: 'https://x.fr/p/1', rules: null, ...extra });
@@ -80,4 +80,18 @@ test('selectVariants accepte une liste et un id', () => {
   const vs = [{ id: 11, title: 'S' }, { id: 12, title: 'M' }];
   assert.deepEqual(selectVariants(vs, ['S', 'M']).length, 2);
   assert.deepEqual(selectVariants(vs, '12')[0].title, 'M');
+});
+
+test('isChallengePage reconnait un mur anti-bot', () => {
+  const cloudflare = '<html><body>Vérifions ensemble que vous n’êtes pas un robot. Ray ID : abc</body></html>';
+  const datadome = '<html><body><script>var dd={host:"geo.captcha-delivery.com"}</script></body></html>';
+  assert.equal(isChallengePage(cloudflare), true);
+  assert.equal(isChallengePage(datadome), true);
+});
+
+test('isChallengePage ne se declenche pas sur une vraie fiche produit', () => {
+  const page = '<html><body><h1>Coffret Dresseur d\'Élite</h1><p>Rupture de stock</p></body></html>';
+  assert.equal(isChallengePage(page), false);
+  assert.equal(isChallengePage(''), false);
+  assert.equal(isChallengePage(null), false);
 });
