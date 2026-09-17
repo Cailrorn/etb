@@ -177,33 +177,8 @@ sites:
       present: ["Ajouter au panier"]
       absent: ["Prévenez-moi lorsque le produit est disponible"]
 
-  # -------------------------------------------------------------------------
-  # Bundle 6 boosters 30e anniversaire — sortie annoncée le 02/10/2026
-  # Aucun des revendeurs généralistes ci-dessus ne le référence encore ;
-  # seuls des spécialistes ont ouvert des pages produit.
-  # -------------------------------------------------------------------------
-
-  # DÉSACTIVÉ — marchand non fiable, ne pas y commander.
-  # Techniquement surveillable (Shopify), mais retiré volontairement le
-  # 2026-09-18 : aucun SIRET, SIREN ni RCS dans ses pages légales, ce qui est
-  # obligatoire pour un site marchand visant la France, et le domaine est
-  # signalé comme frauduleux par Pokescam. Une alerte 🟢 pousserait à l'achat.
-  - name: "Pokekhlass — Bundle 6 boosters"
-    url: "https://pokekhlass.com/products/bundle-pokemon-30eme-anniversaire-francais"
-    mode: shopify
-    enabled: false
-
-  # DestockTCG expose schema.org PreOrder, ce qui ne dit pas si l'article est
-  # commandable : la page annonce "Prévenez-moi de l'ouverture des précommandes".
-  # Le seul signal fiable est le bouton panier. Attention, "Prévenez-moi" figure
-  # sur TOUTES leurs fiches, y compris achetables : une règle fondée dessus
-  # n'alerterait jamais. Validé le 2026-09-18 contre leur ETB, achetable, qui
-  # répond bien EN STOCK.
-  - name: "DestockTCG — Bundle 6 boosters"
-    url: "https://www.destocktcg.fr/product/30e-anniversaire-bundle-6-boosters-pokemon-fr-1756"
-    mode: http
-    in_stock_when:
-      present: ["Ajouter au panier"]
+  # Le Bundle 6 boosters (sortie 02/10/2026) a été retiré de la surveillance le
+  # 2026-09-18 : la date de sortie est connue, l'alerte n'apportait rien.
 
   # -------------------------------------------------------------------------
   # VEILLES — produits premium pas encore commercialisés (sortie T4 2026)
@@ -244,14 +219,6 @@ sites:
     wait_ms: 6000
     in_stock_when:
       present: ["mewtwo"]
-
-  # Le bundle sort le 02/10/2026 et n'est pas encore au catalogue Philibert.
-  - name: "VEILLE Philibert — Bundle 6 boosters"
-    url: "https://www.philibertnet.com/fr/212-pokemon"
-    mode: browser
-    wait_ms: 6000
-    in_stock_when:
-      present: ["bundle"]
 
   # -------------------------------------------------------------------------
   # Smyths Toys — DÉSACTIVÉ, mur anti-bot Imperva / Incapsula
