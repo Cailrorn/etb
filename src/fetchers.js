@@ -107,14 +107,47 @@ const normVariant = (s) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+// Lancer Chromium coute quelques secondes. Avec un site par navigateur, ce cout
+// est paye autant de fois qu'il y a de sites ; on le paie une seule fois par
+// passage. Chaque site garde son propre contexte : cookies et session restent
+// cloisonnes, seul le processus est partage.
+let sharedBrowser = null;
+let launching = null;
+
+async function getBrowser() {
+  if (sharedBrowser?.isConnected()) return sharedBrowser;
+
+  // Un navigateur ferme ou plante entre deux sites doit etre relance, sinon
+  // tous les sites suivants echoueraient en cascade.
+  sharedBrowser = null;
+  if (!launching) {
+    launching = (async () => {
+      const { chromium } = await import('playwright');
+      return chromium.launch({
+        args: ['--disable-blink-features=AutomationControlled', '--no-sandbox'],
+      });
+    })().then(
+      (b) => { sharedBrowser = b; launching = null; return b; },
+      (err) => { launching = null; throw err; },
+    );
+  }
+  return launching;
+}
+
+/** Ferme le navigateur partage. A appeler une fois le passage termine. */
+export async function closeBrowser() {
+  const browser = sharedBrowser;
+  sharedBrowser = null;
+  launching = null;
+  if (browser) await browser.close().catch(() => {});
+}
+
 /** Rendu complet via Chromium headless, pour les boutiques qui affichent le stock en JS. */
 export async function fetchBrowser(site) {
-  const { chromium } = await import('playwright');
-  const browser = await chromium.launch({
-    args: ['--disable-blink-features=AutomationControlled', '--no-sandbox'],
-  });
+  const browser = await getBrowser();
+  let context;
   try {
-    const context = await browser.newContext({
+    context = await browser.newContext({
       userAgent: pickUserAgent(site.user_agent),
       locale: 'fr-FR',
       viewport: { width: 1366, height: 900 },
@@ -126,20 +159,14 @@ export async function fetchBrowser(site) {
     if (site.wait_for_selector) {
       await page.waitForSelector(site.wait_for_selector, { timeout: site.timeout_ms }).catch(() => {});
     }
-    await page.waitForTimeout(site.wait_ms ?? 2000);
 
-    // Certains sites (Carrefour) affichent d'abord un challenge Cloudflare que le
-    // navigateur resout seul en quelques secondes. On patiente plutot que de lire
-    // la page d'attente et de conclure a tort.
-    let html = await page.content();
-    if (isChallengePage(html)) {
-      const deadline = Date.now() + (site.challenge_timeout_ms ?? 25000);
-      while (Date.now() < deadline) {
-        await page.waitForTimeout(2000);
-        html = await page.content();
-        if (!isChallengePage(html)) break;
-      }
-    }
+    // wait_ms est un plafond, pas une pause systematique : on rend la main des
+    // que la page porte un signal exploitable. Une attente fixe coutait ici
+    // plusieurs secondes par site, a chaque passage, pour rien.
+    const html = await waitForSignal(page, {
+      maxMs: site.wait_ms ?? 2000,
+      challengeMs: site.challenge_timeout_ms ?? 25000,
+    });
 
     if (isChallengePage(html)) {
       throw new Error(
@@ -150,7 +177,8 @@ export async function fetchBrowser(site) {
 
     return { html, source: 'browser' };
   } finally {
-    await browser.close();
+    // On ferme le contexte, jamais le navigateur : il sert aux autres sites.
+    if (context) await context.close().catch(() => {});
   }
 }
 
@@ -174,6 +202,34 @@ export async function fetchSite(site) {
     return fetchBrowser(site).catch(() => {
       throw err;
     });
+  }
+}
+
+/** Un signal de disponibilite exploitable est-il deja present dans la page ? */
+const hasUsableSignal = (html) =>
+  /"availability"\s*:\s*"/i.test(html) || /itemprop=["']availability["']/i.test(html);
+
+/**
+ * Attend que la page soit exploitable, puis rend la main immediatement.
+ *
+ * Deux attentes distinctes se superposent ici : le rendu JavaScript du site, et
+ * la resolution d'un eventuel challenge anti-bot, bien plus lente. On sort des
+ * que l'une aboutit plutot que d'attendre un delai fixe calibre sur le pire cas.
+ */
+async function waitForSignal(page, { maxMs, challengeMs, pollMs = 250 }) {
+  let html = await page.content();
+  const start = Date.now();
+
+  while (true) {
+    const challenged = isChallengePage(html);
+    if (!challenged && hasUsableSignal(html)) return html;
+
+    // Un challenge merite beaucoup plus de patience qu'un simple rendu.
+    const budget = challenged ? challengeMs : maxMs;
+    if (Date.now() - start >= budget) return html;
+
+    await page.waitForTimeout(pollMs);
+    html = await page.content();
   }
 }
 
@@ -227,3 +283,6 @@ function looksLikeJsShell(html) {
     .trim();
   return text.length < 400;
 }
+
+// Expose les helpers internes pour les tests, sans elargir l API publique.
+export const __test = { hasUsableSignal, waitForSignal };

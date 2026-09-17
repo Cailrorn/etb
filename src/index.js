@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { loadConfig } from './config.js';
-import { fetchSite } from './fetchers.js';
+import { fetchSite, closeBrowser } from './fetchers.js';
 import { detect } from './detect.js';
 import { loadState, saveState, siteState } from './state.js';
 import {
@@ -43,6 +43,17 @@ async function main() {
 
   log(`Verification de ${sites.length} article(s)${DRY_RUN ? ' [dry-run]' : ''}…\n`);
 
+  try {
+    await checkAll(sites, config, state, results, alerts);
+  } finally {
+    // Sans cette fermeture, le processus resterait vivant apres le dernier site.
+    await closeBrowser();
+  }
+
+  await finish(config, sites, state, results, alerts);
+}
+
+async function checkAll(sites, config, state, results, alerts) {
   await runPool(sites, config.settings.concurrency, async (site) => {
     const prev = siteState(state, site.id);
     let result;
@@ -112,7 +123,10 @@ async function main() {
       url: site.url,
     };
   });
+}
 
+/** Heartbeat, envoi des alertes, sauvegarde de l'etat et ping du watchdog. */
+async function finish(config, sites, state, results, alerts) {
   const hb = config.settings.heartbeat_hours;
   const previousHeartbeat = state.lastHeartbeat;
   if (hb > 0 && isDue(state.lastHeartbeat, hb)) {

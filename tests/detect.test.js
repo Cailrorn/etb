@@ -111,3 +111,10 @@ test('un titre de fiche produit contenant un mot de challenge ne declenche pas',
   const v = '<html><head><title>Verification du produit : kit de test</title></head><body>En stock</body></html>';
   assert.equal(isChallengePage(v), false);
 });
+
+test('hasUsableSignal ne confond pas une page vide avec une page prete', async () => {
+  const { __test } = await import('../src/fetchers.js');
+  assert.equal(__test.hasUsableSignal('<html><body>chargement…</body></html>'), false);
+  assert.equal(__test.hasUsableSignal('<script>{"availability":"https://schema.org/InStock"}</script>'), true);
+  assert.equal(__test.hasUsableSignal('<link itemprop="availability" href="http://schema.org/OutOfStock">'), true);
+});
