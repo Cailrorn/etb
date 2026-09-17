@@ -192,18 +192,23 @@ cron GitHub Actions (toutes les 5 min)
 
 ## Sites actuellement surveillés
 
-Coffret Dresseur d'Élite Pokémon 30e anniversaire (EAN `196214144835`). Chaque site a été testé en conditions réelles le 17/09/2026 — tous en rupture à cette date.
+Coffret Dresseur d'Élite Pokémon 30e anniversaire (EAN `196214144835`). Chaque site a été testé en conditions réelles le 17/09/2026 — tous en rupture à cette date. Les URL ont été nettoyées de leurs paramètres de tracking (`aecid`, `ae`, `idOffre`), sans effet sur la page servie.
 
 | Site | Mode | Détection | État |
 |---|---|---|---|
 | King Jouet | `http` | schema.org `OutOfStock` | ✅ fiable |
 | 1001hobbies | `http` | schema.org `OutOfStock` | ✅ fiable |
+| JouéClub | `http` | schema.org `OutOfStock` | ✅ fiable |
+| La Grande Récré | `http` | schema.org `OutOfStock` | ✅ fiable |
 | Carrefour | `browser` | schema.org `OutOfStock` | ✅ fiable (403 en HTTP simple) |
+| Cdiscount | `browser` | schema.org `OutOfStock` | ✅ fiable (page JS en HTTP simple) |
 | Fnac | — | — | ❌ désactivé, mur anti-bot |
+
+Un passage complet sur les six sites prend environ 9 secondes, largement sous le quota GitHub Actions.
 
 **Pourquoi la Fnac est désactivée.** Le site sert une page de challenge DataDome (`geo.captcha-delivery.com`) à la place de la fiche produit — en HTTP simple comme en navigateur, et y compris depuis une IP résidentielle. Passer ce mur reviendrait à contourner un captcha : ce n'est pas fait ici. La page produit Fnac propose un bouton **« Alerte disponibilité »** qui envoie un mail au restock — c'est la bonne solution pour ce marchand.
 
-> **À vérifier au premier run :** Carrefour a été validé depuis une connexion résidentielle. Les runners GitHub sortent sur des IP de datacenter, souvent filtrées plus durement. Lance le workflow à la main une fois et regarde les logs : si Carrefour remonte en `403`, c'est ce filtrage. Les deux autres sites, eux, ne posent aucune difficulté.
+> **À vérifier au premier run :** Carrefour et Cdiscount ont été validés depuis une connexion résidentielle. Les runners GitHub sortent sur des IP de datacenter, souvent filtrées plus durement. Lance le workflow à la main une fois et regarde les logs : si l'un des deux remonte en `403`, c'est ce filtrage. Les quatre sites en `http` ne posent aucune difficulté.
 
 **Le piège de 1001hobbies** mérite d'être signalé : la page affiche « Ajouter au panier » *même en rupture*, et le mot « Indisponible » se trouve ailleurs dans le DOM. Une règle naïve sur le bouton se serait trompée dans les deux sens. Ce sont les données structurées schema.org qui donnent la bonne réponse — d'où leur priorité sur l'heuristique texte.
 

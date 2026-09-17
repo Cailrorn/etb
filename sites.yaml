@@ -1,12 +1,13 @@
 # ---------------------------------------------------------------------------
 # Pokémon — Coffret Dresseur d'Élite 30e anniversaire (EAN 196214144835)
 #
-# État relevé le 2026-09-17 : en rupture sur les trois sites surveillés.
-# Chaque site ci-dessous a été testé en conditions réelles.
+# État relevé le 2026-09-17 : en rupture chez les six revendeurs surveillés.
+# Chaque site ci-dessous a été testé en conditions réelles (URL nettoyée de ses
+# paramètres de tracking : aecid, ae, idOffre).
 # ---------------------------------------------------------------------------
 
 settings:
-  concurrency: 3
+  concurrency: 4
   heartbeat_hours: 24     # message "je suis vivant" toutes les 24h (0 = désactivé)
   error_alert_after: 3    # alerte après N échecs consécutifs sur un site
   timeout_ms: 30000
@@ -31,6 +32,24 @@ sites:
     url: "https://www.carrefour.fr/p/cartes-a-jouer-et-a-collectionner-coffret-dresseur-d-elite-30e-anniversaire-pokemon-0196214144835"
     mode: browser
     wait_ms: 5000
+
+  # Testé OK : schema.org expose OutOfStock, aucune protection.
+  - name: "JouéClub — ETB 30 ans"
+    url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-dresseur-d-elite-0196214144835.html"
+    mode: http
+
+  # Testé OK : schema.org expose OutOfStock, aucune protection.
+  - name: "La Grande Récré — ETB 30 ans"
+    url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-dresseur-d-elite-pokemon-30e-anniversaire.html"
+    mode: http
+
+  # Testé : en HTTP simple, Cdiscount renvoie une page "activez JavaScript".
+  # Pas de captcha, juste un rendu client : le mode navigateur suffit.
+  # La page rendue affiche "Actuellement indisponible", cohérent avec schema.org.
+  - name: "Cdiscount — ETB 30 ans"
+    url: "https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-etb-coffret-dresseur-d-elite-30e-anniv/f-120791604-pok196214144835.html"
+    mode: browser
+    wait_ms: 6000
 
   # DÉSACTIVÉ — la Fnac sert un mur anti-bot DataDome (captcha) aussi bien en
   # HTTP qu'en navigateur, y compris depuis une IP résidentielle. Il n'existe pas
