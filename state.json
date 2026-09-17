@@ -8,9 +8,10 @@
       "failures": 0,
       "unknowns": 0,
       "lastError": null,
-      "lastCheck": "2026-09-17T22:32:24.582Z",
+      "lastCheck": "2026-09-17T22:41:59.830Z",
       "lastReason": "schema.org availability = OutOfStock",
       "confidence": "high",
+      "lastProblemAlert": null,
       "url": "https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034916-pokemon-30-ans-coffret-dresseur-d-elite.htm"
     },
     "joueclub-etb-30-ans": {
@@ -19,9 +20,10 @@
       "failures": 0,
       "unknowns": 0,
       "lastError": null,
-      "lastCheck": "2026-09-17T22:32:25.224Z",
+      "lastCheck": "2026-09-17T22:42:00.215Z",
       "lastReason": "schema.org availability = OutOfStock",
       "confidence": "high",
+      "lastProblemAlert": null,
       "url": "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-dresseur-d-elite-0196214144835.html"
     },
     "la-grande-recre-etb-30-ans": {
@@ -30,9 +32,10 @@
       "failures": 0,
       "unknowns": 0,
       "lastError": null,
-      "lastCheck": "2026-09-17T22:32:25.351Z",
+      "lastCheck": "2026-09-17T22:42:00.688Z",
       "lastReason": "schema.org availability = OutOfStock",
       "confidence": "high",
+      "lastProblemAlert": null,
       "url": "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-dresseur-d-elite-pokemon-30e-anniversaire.html"
     },
     "1001hobbies-etb-30-ans": {
@@ -41,9 +44,10 @@
       "failures": 0,
       "unknowns": 0,
       "lastError": null,
-      "lastCheck": "2026-09-17T22:32:31.431Z",
+      "lastCheck": "2026-09-17T22:42:10.432Z",
       "lastReason": "schema.org availability = OutOfStock",
       "confidence": "high",
+      "lastProblemAlert": null,
       "url": "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892561-pokemon-company-bm-258861-pokemon-30eme-anniversaire-elite-trainer-196214144835.html"
     },
     "carrefour-etb-30-ans": {
@@ -52,9 +56,10 @@
       "failures": 0,
       "unknowns": 0,
       "lastError": null,
-      "lastCheck": "2026-09-17T22:34:00.391Z",
+      "lastCheck": "2026-09-17T22:42:01.417Z",
       "lastReason": "schema.org availability = OutOfStock",
       "confidence": "high",
+      "lastProblemAlert": null,
       "url": "https://www.carrefour.fr/p/cartes-a-jouer-et-a-collectionner-coffret-dresseur-d-elite-30e-anniversaire-pokemon-0196214144835"
     },
     "cdiscount-etb-30-ans": {
@@ -63,9 +68,10 @@
       "failures": 0,
       "unknowns": 0,
       "lastError": null,
-      "lastCheck": "2026-09-17T22:32:35.851Z",
+      "lastCheck": "2026-09-17T22:42:01.836Z",
       "lastReason": "schema.org availability = OutOfStock",
       "confidence": "high",
+      "lastProblemAlert": null,
       "url": "https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-etb-coffret-dresseur-d-elite-30e-anniv/f-120791604-pok196214144835.html"
     },
     "joueclub-coffret-poster": {
@@ -74,9 +80,10 @@
       "failures": 0,
       "unknowns": 0,
       "lastError": null,
-      "lastCheck": "2026-09-17T22:32:25.992Z",
+      "lastCheck": "2026-09-17T22:42:01.487Z",
       "lastReason": "schema.org availability = OutOfStock",
       "confidence": "high",
+      "lastProblemAlert": null,
       "url": "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-collection-poster-0196214147225.html"
     },
     "la-grande-recre-coffret-poster": {
@@ -85,9 +92,10 @@
       "failures": 0,
       "unknowns": 0,
       "lastError": null,
-      "lastCheck": "2026-09-17T22:32:26.446Z",
+      "lastCheck": "2026-09-17T22:42:01.928Z",
       "lastReason": "schema.org availability = OutOfStock",
       "confidence": "high",
+      "lastProblemAlert": null,
       "url": "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-collection-poster-pokemon-30e-anniversaire.html"
     },
     "cdiscount-coffret-poster": {
@@ -96,9 +104,10 @@
       "failures": 0,
       "unknowns": 0,
       "lastError": null,
-      "lastCheck": "2026-09-17T22:32:35.953Z",
+      "lastCheck": "2026-09-17T22:42:03.316Z",
       "lastReason": "schema.org availability = OutOfStock",
       "confidence": "high",
+      "lastProblemAlert": null,
       "url": "https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-30-ans-coffret-poster-30eme-anniversaire/f-120791604-pok196214147225.html"
     },
     "carrefour-coffret-poster": {
@@ -107,9 +116,10 @@
       "failures": 0,
       "unknowns": 0,
       "lastError": null,
-      "lastCheck": "2026-09-17T22:33:21.628Z",
+      "lastCheck": "2026-09-17T22:42:03.157Z",
       "lastReason": "schema.org availability = OutOfStock",
       "confidence": "high",
+      "lastProblemAlert": null,
       "url": "https://www.carrefour.fr/p/coffret-pokemon-collection-poster-30e-anniversaire-pokemon-0196214147225"
     }
   }
