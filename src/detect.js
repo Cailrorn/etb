@@ -30,6 +30,64 @@ const norm = (s) =>
     .replace(/\s+/g, ' ');
 
 /**
+ * Racine grossiere d'un mot francais : retire le pluriel et le feminin.
+ * "epuises", "epuisee" et "epuise" se ramenent ainsi a la meme forme, ce qui
+ * evite d'enumerer toutes les variantes dans les listes de termes.
+ */
+const stem = (w) => w.replace(/(s|x)$/, '').replace(/e+$/, '');
+
+/** Decoupe un texte en mots normalises et deracines. */
+const words = (s) => norm(s).split(/[^a-z0-9]+/).filter(Boolean).map(stem);
+
+/**
+ * Cherche une expression comme une suite de mots entiers, et renvoie sa
+ * position (ou -1).
+ *
+ * La comparaison mot a mot est indispensable : en cherchant une sous-chaine,
+ * "disponible" se trouve a l'interieur d'"indisponible", et un article en
+ * rupture serait annonce comme disponible.
+ */
+function findPhrase(textWords, phrase) {
+  const needle = words(phrase);
+  if (needle.length === 0) return -1;
+
+  outer:
+  for (let i = 0; i + needle.length <= textWords.length; i++) {
+    for (let j = 0; j < needle.length; j++) {
+      if (textWords[i + j] !== needle[j]) continue outer;
+    }
+    return i;
+  }
+  return -1;
+}
+
+const hasPhrase = (textWords, phrase) => findPhrase(textWords, phrase) !== -1;
+
+// "bientot en stock" ou "plus en stock" annoncent une indisponibilite tout en
+// contenant l'expression "en stock". On inspecte donc ce qui precede.
+const NEGATORS = ['bientot', 'prochainement', 'plus', 'pas', 'non', 'jamais', 'sans'].map(stem);
+
+/** Trouve une expression de disponibilite qui ne soit pas niee juste avant. */
+function findPositive(textWords, phrases) {
+  for (const phrase of phrases) {
+    const needle = words(phrase);
+    if (needle.length === 0) continue;
+
+    for (let i = 0; i + needle.length <= textWords.length; i++) {
+      let hit = true;
+      for (let j = 0; j < needle.length; j++) {
+        if (textWords[i + j] !== needle[j]) { hit = false; break; }
+      }
+      if (!hit) continue;
+
+      const before = textWords.slice(Math.max(0, i - 3), i);
+      if (!before.some((w) => NEGATORS.includes(w))) return phrase;
+    }
+  }
+  return null;
+}
+
+/**
  * Determine la disponibilite d'un article.
  * Retourne { inStock, reason, confidence } ; inStock vaut null si indeterminable.
  */
@@ -50,10 +108,13 @@ export function detect(site, fetched) {
   if (site.scope && scoped.length === 0) {
     return { inStock: null, reason: `Selecteur "scope" introuvable : ${site.scope}`, confidence: 'none' };
   }
-  const text = norm(scoped.text());
+  // cheerio colle le texte des elements voisins : <h1>Article</h1><p>Rupture</p>
+  // donnerait "ArticleRupture". On remplace donc les balises par des espaces.
+  const scopedHtml = site.scope ? scoped.map((i, el) => $.html(el)).get().join(' ') : $.html();
+  const textWords = words(scopedHtml.replace(/<[^>]+>/g, ' '));
 
   // 1. Regles explicites definies dans sites.yaml : elles font autorite.
-  if (site.rules) return applyRules(site.rules, $, text, fetched.html);
+  if (site.rules) return applyRules(site.rules, $, textWords, fetched.html);
 
   // 2. Donnees structurees schema.org : la source la plus fiable apres l'API du site.
   const schema = readSchemaAvailability(fetched.html);
@@ -66,8 +127,8 @@ export function detect(site, fetched) {
   }
 
   // 3. Heuristique textuelle.
-  const outHit = OUT_OF_STOCK_PHRASES.find((p) => text.includes(p));
-  const inHit = IN_STOCK_PHRASES.find((p) => text.includes(p));
+  const outHit = OUT_OF_STOCK_PHRASES.find((p) => hasPhrase(textWords, p));
+  const inHit = findPositive(textWords, IN_STOCK_PHRASES);
   const cartActive = CART_SELECTORS.some((sel) => {
     const el = $(sel).first();
     return el.length > 0 && el.attr('disabled') === undefined && !norm(el.attr('class')).includes('disabled');
@@ -93,14 +154,14 @@ export function detect(site, fetched) {
   };
 }
 
-function applyRules(rules, $, text, rawHtml) {
+function applyRules(rules, $, textWords, rawHtml) {
   const failures = [];
 
   for (const phrase of rules.present) {
-    if (!text.includes(norm(phrase))) failures.push(`texte requis absent : "${phrase}"`);
+    if (!hasPhrase(textWords, phrase)) failures.push(`texte requis absent : "${phrase}"`);
   }
   for (const phrase of rules.absent) {
-    if (text.includes(norm(phrase))) failures.push(`texte interdit present : "${phrase}"`);
+    if (hasPhrase(textWords, phrase)) failures.push(`texte interdit present : "${phrase}"`);
   }
   for (const sel of rules.selector_exists) {
     if ($(sel).length === 0) failures.push(`selecteur requis absent : "${sel}"`);

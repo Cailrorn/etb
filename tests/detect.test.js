@@ -118,3 +118,42 @@ test('hasUsableSignal ne confond pas une page vide avec une page prete', async (
   assert.equal(__test.hasUsableSignal('<script>{"availability":"https://schema.org/InStock"}</script>'), true);
   assert.equal(__test.hasUsableSignal('<link itemprop="availability" href="http://schema.org/OutOfStock">'), true);
 });
+
+// --- Robustesse du rapprochement de termes ---------------------------------
+
+const heur = (body) => detect(site(), page(body));
+
+test('"indisponible" n est jamais lu comme "disponible"', () => {
+  assert.equal(heur('<p>Produit indisponible</p>').inStock, false);
+  assert.equal(heur('<p>Non disponible</p>').inStock, false);
+  assert.equal(heur('<p>Ce produit n est plus disponible</p>').inStock, false);
+});
+
+test('"bientot en stock" n est pas lu comme une disponibilite', () => {
+  assert.notEqual(heur('<p>Bientôt en stock</p>').inStock, true);
+  assert.notEqual(heur('<p>Prochainement en stock</p>').inStock, true);
+  assert.notEqual(heur('<p>Ce produit n est plus en stock</p>').inStock, true);
+});
+
+test('"en stock" sans negation reste une disponibilite', () => {
+  assert.equal(heur('<p>Article en stock, expedition immediate</p>').inStock, true);
+});
+
+test('la casse et les accents sont ignores', () => {
+  assert.equal(heur('<p>RUPTURE DE STOCK</p>').inStock, false);
+  assert.equal(heur('<p>Épuisé</p>').inStock, false);
+  assert.equal(heur('<p>epuise</p>').inStock, false);
+  assert.equal(heur('<p>ÉPUISÉ</p>').inStock, false);
+});
+
+test('le pluriel et le feminin sont reconnus sans les enumerer', () => {
+  assert.equal(heur('<p>Articles épuisés</p>').inStock, false);
+  assert.equal(heur('<p>Piece épuisée</p>').inStock, false);
+  assert.equal(heur('<p>Produits indisponibles</p>').inStock, false);
+});
+
+test('un mot ne matche pas au milieu d un autre', () => {
+  // "destockage" contient "stock", "predisponible" contient "disponible" :
+  // une recherche de sous-chaine s y laisserait prendre.
+  assert.equal(heur('<p>Rayon destockage et antistock</p>').inStock, null);
+});

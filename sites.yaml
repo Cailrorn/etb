@@ -116,6 +116,20 @@ sites:
     wait_ms: 8000
     challenge_timeout_ms: 30000
 
+  # Philibert n'expose aucune donnée schema.org et rend sa zone d'achat en JS :
+  # mode navigateur obligatoire, avec une règle explicite.
+  # Règle validée dans les deux sens le 2026-09-18 : elle répond bien "en stock"
+  # sur un produit Philibert réellement disponible, pas seulement "rupture" ici.
+  #   en rupture : "À VENIR : SEPTEMBRE" + "Prévenez-moi lorsque le produit…"
+  #   en stock   : bouton "Ajouter au panier" + "En stock"
+  - name: "Philibert — Coffret Nymphali"
+    url: "https://www.philibertnet.com/fr/pokemon/182497-pokemon-30-ans-coffret-nymphali-ex-196214147102.html"
+    mode: browser
+    wait_ms: 6000
+    in_stock_when:
+      present: ["Ajouter au panier"]
+      absent: ["Prévenez-moi lorsque le produit est disponible"]
+
   # -------------------------------------------------------------------------
   # Coffret 4 boosters Amphinobi-ex — EAN 196214147164
   # Les quatre liens testés le 2026-09-18 : bon produit, bon EAN, en rupture.
@@ -138,6 +152,15 @@ sites:
     mode: browser
     wait_ms: 8000
     challenge_timeout_ms: 30000
+
+  # Voir la note sur Philibert plus haut (Coffret Nymphali).
+  - name: "Philibert — Coffret Amphinobi"
+    url: "https://www.philibertnet.com/fr/pokemon/182496-pokemon-30-ans-coffret-amphinobi-ex-196214147164.html"
+    mode: browser
+    wait_ms: 6000
+    in_stock_when:
+      present: ["Ajouter au panier"]
+      absent: ["Prévenez-moi lorsque le produit est disponible"]
 
 # Pour ajouter un revendeur : copie un bloc, change name + url, garde mode: http
 # et lance `npm run check:dry -- --verbose` pour voir si la détection tombe juste.
