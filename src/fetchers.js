@@ -177,24 +177,43 @@ export async function fetchSite(site) {
   }
 }
 
+// Marqueurs presents dans le corps de la page : suffisamment distinctifs pour
+// ne pas apparaitre dans une vraie fiche produit.
 const CHALLENGE_MARKERS = [
   'vous n’etes pas un robot', "vous n'etes pas un robot", 'verifions ensemble',
-  'just a moment', 'checking your browser', 'enable javascript and cookies to continue',
+  'checking your browser', 'verification de votre navigateur',
+  'enable javascript and cookies to continue',
   'geo.captcha-delivery.com', 'cf-challenge', 'cf_chl_opt', '__cf_chl',
 ];
 
+// Titres de pages d'attente. Compares au <title> entier et non au corps :
+// "un instant" isole apparaitrait dans trop de pages legitimes.
+const CHALLENGE_TITLES = [
+  'un instant', 'just a moment', 'acces bloque', 'attention required',
+  'veuillez patienter', 'please wait', 'access denied', 'acces refuse',
+  'security check', 'verification', 'maintenance',
+];
+
+const stripAccents = (s) =>
+  String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
 /**
- * Reconnait une page d'attente anti-bot plutot qu'un vrai contenu.
+ * Reconnait une page d'attente ou de blocage anti-bot plutot qu'un vrai contenu.
  * Distinguer ce cas d'un "aucun signal trouve" evite qu'un site bloque passe
  * pour un site simplement illisible, et silencieux de surcroit.
  */
 export function isChallengePage(html) {
   if (!html) return false;
-  const haystack = String(html)
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase();
-  return CHALLENGE_MARKERS.some((m) => haystack.includes(m));
+  const haystack = stripAccents(html);
+  if (CHALLENGE_MARKERS.some((m) => haystack.includes(m))) return true;
+
+  // Comparaison exacte, jamais par prefixe : une fiche produit intitulee
+  // "Verification du kit" ne doit pas passer pour une page de blocage.
+  const title = stripAccents((String(html).match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1])
+    .replace(/[\s.…·|—-]+$/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return title.length > 0 && CHALLENGE_TITLES.includes(title);
 }
 
 /** Heuristique : page quasi vide cote HTML => l'appli est rendue cote client. */

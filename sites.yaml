@@ -1,9 +1,12 @@
 # ---------------------------------------------------------------------------
-# Pokémon — Coffret Dresseur d'Élite 30e anniversaire (EAN 196214144835)
+# Pokémon 30e anniversaire — deux articles surveillés :
+#   · Coffret Dresseur d'Élite  (ETB)     EAN 196214144835
+#   · Coffret Collection Poster (Poster)  EAN 196214147225
 #
-# État relevé le 2026-09-17 : en rupture chez les six revendeurs surveillés.
-# Chaque site ci-dessous a été testé en conditions réelles (URL nettoyée de ses
-# paramètres de tracking : aecid, ae, idOffre).
+# État relevé le 2026-09-18 : tout en rupture chez tous les revendeurs.
+# Chaque lien a été testé en conditions réelles, et vérifié comme pointant bien
+# sur le bon EAN. URL nettoyées de leurs paramètres de tracking (aecid, ae,
+# idOffre), sans effet sur la page servie.
 # ---------------------------------------------------------------------------
 
 settings:
@@ -64,6 +67,30 @@ sites:
     url: "https://www.fnac.com/Cartes-a-collectionner-Pokemon-30A-Coffret-Dresseur-d-Elite/a23200296/w-4"
     mode: browser
     enabled: false
+
+  # -------------------------------------------------------------------------
+  # Coffret Collection Poster — EAN 196214147225
+  # Les quatre liens testés le 2026-09-18 : bon produit, bon EAN, en rupture.
+  # -------------------------------------------------------------------------
+
+  - name: "JouéClub — Coffret Poster"
+    url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-collection-poster-0196214147225.html"
+    mode: http
+
+  - name: "La Grande Récré — Coffret Poster"
+    url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-collection-poster-pokemon-30e-anniversaire.html"
+    mode: http
+
+  - name: "Cdiscount — Coffret Poster"
+    url: "https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-30-ans-coffret-poster-30eme-anniversaire/f-120791604-pok196214147225.html"
+    mode: browser
+    wait_ms: 6000
+
+  - name: "Carrefour — Coffret Poster"
+    url: "https://www.carrefour.fr/p/coffret-pokemon-collection-poster-30e-anniversaire-pokemon-0196214147225"
+    mode: browser
+    wait_ms: 8000
+    challenge_timeout_ms: 30000
 
 # Pour ajouter un revendeur : copie un bloc, change name + url, garde mode: http
 # et lance `npm run check:dry -- --verbose` pour voir si la détection tombe juste.

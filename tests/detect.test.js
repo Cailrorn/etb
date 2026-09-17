@@ -95,3 +95,19 @@ test('isChallengePage ne se declenche pas sur une vraie fiche produit', () => {
   assert.equal(isChallengePage(''), false);
   assert.equal(isChallengePage(null), false);
 });
+
+test('isChallengePage reconnait les murs anti-bot en francais', () => {
+  assert.equal(isChallengePage('<html><head><title>Un instant…</title></head><body></body></html>'), true);
+  assert.equal(isChallengePage('<html><head><title>Accès bloqué</title></head><body></body></html>'), true);
+  // Titre compose : non reconnu par le titre seul, mais le marqueur DataDome
+  // present dans le corps de la page Fnac le rattrape.
+  assert.equal(isChallengePage('<html><head><title>FNAC DARTY - Maintenance</title></head><body></body></html>'), false);
+  assert.equal(isChallengePage('<html><head><title>Maintenance</title></head><body></body></html>'), true);
+});
+
+test('un titre de fiche produit contenant un mot de challenge ne declenche pas', () => {
+  const p = '<html><head><title>Coffret Collection Poster Pokémon 30e Anniversaire - La Grande Récré</title></head><body>Rupture de stock</body></html>';
+  assert.equal(isChallengePage(p), false);
+  const v = '<html><head><title>Verification du produit : kit de test</title></head><body>En stock</body></html>';
+  assert.equal(isChallengePage(v), false);
+});
