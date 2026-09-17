@@ -178,6 +178,30 @@ sites:
       absent: ["Prévenez-moi lorsque le produit est disponible"]
 
   # -------------------------------------------------------------------------
+  # Bundle 6 boosters 30e anniversaire — sortie annoncée le 02/10/2026
+  # Aucun des revendeurs généralistes ci-dessus ne le référence encore ;
+  # seuls des spécialistes ont ouvert des pages produit.
+  # -------------------------------------------------------------------------
+
+  # Boutique Shopify : disponibilité lue directement dans l'API, sans scraping.
+  # En précommande ouverte au 2026-09-18, à 49,99 €.
+  - name: "Pokekhlass — Bundle 6 boosters"
+    url: "https://pokekhlass.com/products/bundle-pokemon-30eme-anniversaire-francais"
+    mode: shopify
+
+  # DestockTCG expose schema.org PreOrder, ce qui ne dit pas si l'article est
+  # commandable : la page annonce "Prévenez-moi de l'ouverture des précommandes".
+  # Le seul signal fiable est le bouton panier. Attention, "Prévenez-moi" figure
+  # sur TOUTES leurs fiches, y compris achetables : une règle fondée dessus
+  # n'alerterait jamais. Validé le 2026-09-18 contre leur ETB, achetable, qui
+  # répond bien EN STOCK.
+  - name: "DestockTCG — Bundle 6 boosters"
+    url: "https://www.destocktcg.fr/product/30e-anniversaire-bundle-6-boosters-pokemon-fr-1756"
+    mode: http
+    in_stock_when:
+      present: ["Ajouter au panier"]
+
+  # -------------------------------------------------------------------------
   # VEILLES — produits premium pas encore commercialisés (sortie T4 2026)
   #
   # Ici on ne surveille pas la disponibilité d'une fiche produit, mais son
@@ -216,6 +240,14 @@ sites:
     wait_ms: 6000
     in_stock_when:
       present: ["mewtwo"]
+
+  # Le bundle sort le 02/10/2026 et n'est pas encore au catalogue Philibert.
+  - name: "VEILLE Philibert — Bundle 6 boosters"
+    url: "https://www.philibertnet.com/fr/212-pokemon"
+    mode: browser
+    wait_ms: 6000
+    in_stock_when:
+      present: ["bundle"]
 
   # -------------------------------------------------------------------------
   # Smyths Toys — DÉSACTIVÉ, mur anti-bot Imperva / Incapsula

@@ -188,6 +188,13 @@ function readSchemaAvailability(html) {
   if (values.some((v) => v.includes('instock') || v.includes('limitedavailability') || v.includes('presale'))) {
     return true;
   }
+  // PreOrder et InStoreOnly ne disent pas si l'article est commandable en ligne
+  // maintenant : DestockTCG affiche PreOrder avant meme l'ouverture des
+  // precommandes. On rend la main aux regles du site plutot que de trancher a
+  // sa place, dans un sens comme dans l'autre.
+  if (values.some((v) => v.includes('preorder') || v.includes('instoreonly'))) {
+    return null;
+  }
   if (values.some((v) => v.includes('outofstock') || v.includes('soldout') || v.includes('discontinued') || v.includes('backorder'))) {
     return false;
   }
