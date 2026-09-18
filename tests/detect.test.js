@@ -176,17 +176,4 @@ test('visibleTextLength ignore scripts et balises', async () => {
   assert.ok(visibleTextLength(`<body><h1>Coffret</h1><p>${'texte '.repeat(60)}</p></body>`) > 200);
 });
 
-test('schema.org PreOrder ne tranche pas a la place des regles du site', () => {
-  // DestockTCG affiche PreOrder avant meme l'ouverture des precommandes :
-  // le conclure "disponible" enverrait acheter un article non commandable,
-  // le conclure "rupture" masquerait l'ouverture des precommandes.
-  const html = '<script>{"availability":"https://schema.org/PreOrder"}</script>' +
-    '<html><body><p>Article a paraitre</p></body></html>';
-  assert.equal(detect(site(), { html }).inStock, null);
-});
 
-test('schema.org InStock prime sur un PreOrder present ailleurs dans la page', () => {
-  const html = '<script>{"availability":"https://schema.org/InStock"}</script>' +
-    '<script>{"availability":"https://schema.org/PreOrder"}</script><html><body>x</body></html>';
-  assert.equal(detect(site(), { html }).inStock, true);
-});

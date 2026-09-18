@@ -313,39 +313,6 @@
       "confidence": "high",
       "lastProblemAlert": null,
       "url": "https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034913-pokemon-30-ans-coffret-amphinobi-ex.htm"
-    },
-    "pokekhlass-bundle-6-boosters": {
-      "inStock": true,
-      "since": "2026-09-17T23:57:11.765Z",
-      "failures": 0,
-      "unknowns": 0,
-      "lastError": null,
-      "lastCheck": "2026-09-17T23:57:11.765Z",
-      "lastReason": "Disponible : Default Title",
-      "confidence": "high",
-      "lastProblemAlert": null,
-      "url": "https://pokekhlass.com/products/bundle-pokemon-30eme-anniversaire-francais"
-    },
-    "destocktcg-bundle-6-boosters": {
-      "inStock": null,
-      "since": null,
-      "failures": 1,
-      "unknowns": 0,
-      "lastError": "HTTP 403 Forbidden",
-      "lastCheck": "2026-09-17T23:57:16.710Z",
-      "lastProblemAlert": null
-    },
-    "veille-philibert-bundle-6-boosters": {
-      "inStock": false,
-      "since": "2026-09-17T23:57:31.099Z",
-      "failures": 0,
-      "unknowns": 0,
-      "lastError": null,
-      "lastCheck": "2026-09-17T23:57:31.099Z",
-      "lastReason": "texte requis absent : \"bundle\"",
-      "confidence": "high",
-      "lastProblemAlert": null,
-      "url": "https://www.philibertnet.com/fr/212-pokemon"
     }
   }
 }

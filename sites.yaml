@@ -181,9 +181,6 @@ sites:
       present: ["Ajouter au panier"]
       absent: ["Prévenez-moi lorsque le produit est disponible"]
 
-  # Le Bundle 6 boosters (sortie 02/10/2026) a été retiré de la surveillance le
-  # 2026-09-18 : la date de sortie est connue, l'alerte n'apportait rien.
-
   # -------------------------------------------------------------------------
   # VEILLES — produits premium pas encore commercialisés (sortie T4 2026)
   #
