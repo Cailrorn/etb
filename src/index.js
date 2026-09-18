@@ -54,7 +54,30 @@ async function main() {
     await closeBrowser();
   }
 
+  // Uniquement sur un passage complet : avec --only, tous les autres sites
+  // seraient pris pour des orphelins et leur historique efface.
+  if (!only) pruneOrphans(state, config.sites);
+
   await finish(config, sites, state, results, alerts);
+}
+
+/**
+ * Supprime de l'etat les sites qui ne sont plus dans la configuration.
+ *
+ * Sans cela, un site retire ou desactive garde son entree indefiniment, avec
+ * son dernier statut et ses compteurs d'echec : state.json finit par decrire
+ * une surveillance qui n'existe plus, et un diagnostic y lit de faux problemes.
+ */
+function pruneOrphans(state, activeSites) {
+  const active = new Set(activeSites.map((s) => s.id));
+  const orphans = Object.keys(state.sites).filter((id) => !active.has(id));
+
+  for (const id of orphans) delete state.sites[id];
+
+  if (orphans.length > 0) {
+    log(`\nEtat nettoye : ${orphans.length} entree(s) obsolete(s) retiree(s) — ${orphans.join(', ')}`);
+  }
+  return orphans;
 }
 
 async function checkAll(sites, config, state, results, alerts) {

@@ -90,3 +90,47 @@ test('le marqueur DEMO est en premiere ligne, la ou l apercu du telephone le mon
   assert.match(lines[0], /DEMO/);
   assert.equal(lines[0].includes('EN STOCK'), false);
 });
+
+// --- Nettoyage de l'etat ---------------------------------------------------
+
+const ONE_SITE = `
+settings:
+  heartbeat_hours: 0
+  retries: 0
+sites:
+  - name: "Livre en stock"
+    url: "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
+    mode: http
+    in_stock_when:
+      present: ["In stock"]
+`;
+
+test('un site retire de la config disparait de l etat', () => {
+  const state = {
+    version: 1,
+    lastHeartbeat: null,
+    sites: {
+      'livre-en-stock': { inStock: true, failures: 0 },
+      'marchand-retire': { inStock: false, failures: 3, lastError: 'HTTP 403' },
+      'veille-supprimee': { inStock: null, failures: 0 },
+    },
+  };
+  const { out, state: after } = run(ONE_SITE, state);
+  assert.match(out, /Etat nettoye : 2 entree/);
+  assert.deepEqual(Object.keys(after.sites), ['livre-en-stock']);
+});
+
+test('--only ne purge pas les autres sites', () => {
+  // Un passage cible ne voit qu'un site : purger ici effacerait tout le reste.
+  const cfgPath = join(dir, 'only.yaml');
+  const statePath = join(dir, 'only.json');
+  writeFileSync(cfgPath, ONE_SITE);
+  writeFileSync(statePath, JSON.stringify({
+    version: 1, lastHeartbeat: null,
+    sites: { 'livre-en-stock': { inStock: true, failures: 0 }, 'autre-site': { inStock: false, failures: 0 } },
+  }));
+  execFileSync(process.execPath, ['src/index.js', '--dry-run', '--only=livre-en-stock',
+    `--config=${cfgPath}`, `--state=${statePath}`], { encoding: 'utf8' });
+  const after = JSON.parse(readFileSync(statePath, 'utf8'));
+  assert.ok(after.sites['autre-site'], 'l historique des autres sites doit survivre');
+});
