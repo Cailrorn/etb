@@ -182,46 +182,6 @@ sites:
       absent: ["Prévenez-moi lorsque le produit est disponible"]
 
   # -------------------------------------------------------------------------
-  # VEILLES — produits premium pas encore commercialisés (sortie T4 2026)
-  #
-  # Ici on ne surveille pas la disponibilité d'une fiche produit, mais son
-  # APPARITION : la règle scrute la page catégorie Pokémon de Philibert, triée
-  # par nouveautés. Le jour où une fiche premium y est publiée, le terme
-  # apparaît et l'alerte 🟢 part avec le lien de la catégorie.
-  #
-  # Validé le 2026-09-18 : un témoin cherchant "amphinobi" (déjà en catalogue)
-  # répond bien EN STOCK sur cette même page, donc la veille se déclenchera.
-  #
-  # Philibert seulement : les autres revendeurs rendent leurs catégories en JS
-  # derrière des URL non devinables, et leurs sitemaps pèsent 8 à 11 Mo, trop
-  # lourds à télécharger toutes les 5 minutes.
-  #
-  # Limite : si la catégorie cessait d'être triée par nouveautés, une fiche
-  # pourrait apparaître en page 2 et échapper à la veille.
-  # -------------------------------------------------------------------------
-
-  - name: "VEILLE Philibert — Coffret Ultra-Premium"
-    url: "https://www.philibertnet.com/fr/212-pokemon"
-    mode: browser
-    wait_ms: 6000
-    in_stock_when:
-      present: ["ultra premium"]
-
-  - name: "VEILLE Philibert — Coffret Premium Métamorph"
-    url: "https://www.philibertnet.com/fr/212-pokemon"
-    mode: browser
-    wait_ms: 6000
-    in_stock_when:
-      present: ["metamorph"]
-
-  - name: "VEILLE Philibert — Collection figurine Mewtwo"
-    url: "https://www.philibertnet.com/fr/212-pokemon"
-    mode: browser
-    wait_ms: 6000
-    in_stock_when:
-      present: ["mewtwo"]
-
-  # -------------------------------------------------------------------------
   # Smyths Toys — DÉSACTIVÉ, mur anti-bot Imperva / Incapsula
   #
   # Testé le 2026-09-18 depuis une IP résidentielle : en HTTP simple le site

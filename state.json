@@ -242,42 +242,6 @@
       "lastProblemAlert": null,
       "url": "https://www.philibertnet.com/fr/pokemon/182496-pokemon-30-ans-coffret-amphinobi-ex-196214147164.html"
     },
-    "veille-philibert-coffret-ultra-premium": {
-      "inStock": false,
-      "since": "2026-09-17T23:49:04.810Z",
-      "failures": 0,
-      "unknowns": 0,
-      "lastError": null,
-      "lastCheck": "2026-09-17T23:57:20.262Z",
-      "lastReason": "texte requis absent : \"ultra premium\"",
-      "confidence": "high",
-      "lastProblemAlert": null,
-      "url": "https://www.philibertnet.com/fr/212-pokemon"
-    },
-    "veille-philibert-coffret-premium-metamorph": {
-      "inStock": false,
-      "since": "2026-09-17T23:49:09.628Z",
-      "failures": 0,
-      "unknowns": 0,
-      "lastError": null,
-      "lastCheck": "2026-09-17T23:57:23.837Z",
-      "lastReason": "texte requis absent : \"metamorph\"",
-      "confidence": "high",
-      "lastProblemAlert": null,
-      "url": "https://www.philibertnet.com/fr/212-pokemon"
-    },
-    "veille-philibert-collection-figurine-mewtwo": {
-      "inStock": false,
-      "since": "2026-09-17T23:49:11.874Z",
-      "failures": 0,
-      "unknowns": 0,
-      "lastError": null,
-      "lastCheck": "2026-09-17T23:57:27.466Z",
-      "lastReason": "texte requis absent : \"mewtwo\"",
-      "confidence": "high",
-      "lastProblemAlert": null,
-      "url": "https://www.philibertnet.com/fr/212-pokemon"
-    },
     "king-jouet-coffret-poster": {
       "inStock": false,
       "since": "2026-09-17T23:57:00.873Z",

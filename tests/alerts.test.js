@@ -112,7 +112,7 @@ test('un site retire de la config disparait de l etat', () => {
     sites: {
       'livre-en-stock': { inStock: true, failures: 0 },
       'marchand-retire': { inStock: false, failures: 3, lastError: 'HTTP 403' },
-      'veille-supprimee': { inStock: null, failures: 0 },
+      'entree-obsolete': { inStock: null, failures: 0 },
     },
   };
   const { out, state: after } = run(ONE_SITE, state);
