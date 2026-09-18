@@ -25,12 +25,19 @@ sites:
     url: "https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034916-pokemon-30-ans-coffret-dresseur-d-elite.htm"
     mode: http
 
-  # Testé OK : schema.org expose OutOfStock.
-  # Attention, la page affiche "Ajouter au panier" même en rupture : les données
-  # structurées font foi, ne pas remplacer par une règle sur ce texte.
+  # ATTENTION — le balisage schema.org de 1001hobbies n'est pas fiable.
+  # Le 2026-09-18 il annonçait InStock sur les quatre fiches alors qu'elles
+  # affichaient "Non disponible actuellement", ce qui a déclenché une fausse
+  # alerte d'achat. Les quatre entrées de ce marchand utilisent donc une règle
+  # explicite sur le texte visible, qui est la seule source exacte ici.
+  # Règle validée dans les deux sens contre deux produits 1001hobbies
+  # réellement en stock, qui répondent bien EN STOCK.
+  # Ne pas revenir aux données structurées pour ce site.
   - name: "1001hobbies — ETB 30 ans"
     url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892561-pokemon-company-bm-258861-pokemon-30eme-anniversaire-elite-trainer-196214144835.html"
     mode: http
+    in_stock_when:
+      absent: ["Non disponible actuellement"]
 
   # Testé : 403 en HTTP simple, OK en mode navigateur, où schema.org expose
   # OutOfStock de façon fiable. Depuis les runners GitHub, Cloudflare sert son
@@ -81,6 +88,8 @@ sites:
   - name: "1001hobbies — Coffret Poster"
     url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892555-pokemon-company-bm-258860-pokemon-30eme-anniversaire-collection-po-196214147225.html"
     mode: http
+    in_stock_when:
+      absent: ["Non disponible actuellement"]
 
   # King Jouet ne publie pas l'EAN : identité vérifiée par le titre de la page.
   - name: "King Jouet — Coffret Poster"
@@ -110,6 +119,8 @@ sites:
   - name: "1001hobbies — Coffret Nymphali"
     url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892558-pokemon-company-bm-258858-pokemon-30eme-anniversaire-coffret-nymph-196214147102.html"
     mode: http
+    in_stock_when:
+      absent: ["Non disponible actuellement"]
 
   - name: "JouéClub — Coffret Nymphali"
     url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-nymphali-ex-0196214147102.html"
@@ -152,6 +163,8 @@ sites:
   - name: "1001hobbies — Coffret Amphinobi"
     url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892559-pokemon-company-bm-258857-pokemon-30eme-anniversaire-coffret-amphi-196214147164.html"
     mode: http
+    in_stock_when:
+      absent: ["Non disponible actuellement"]
 
   - name: "JouéClub — Coffret Amphinobi"
     url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-amphinobi-ex-0196214147164.html"

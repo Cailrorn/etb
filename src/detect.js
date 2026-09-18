@@ -116,8 +116,24 @@ export function detect(site, fetched) {
   // 1. Regles explicites definies dans sites.yaml : elles font autorite.
   if (site.rules) return applyRules(site.rules, $, textWords, fetched.html);
 
-  // 2. Donnees structurees schema.org : la source la plus fiable apres l'API du site.
+  // 2. Donnees structurees schema.org : la source la plus fiable apres l'API du
+  // site, mais pas une parole d'evangile. Un marchand peut publier InStock sur
+  // une fiche qui affiche "Non disponible actuellement" : c'est arrive, et cela
+  // a declenche une fausse alerte d'achat. On ne tranche pas a sa place quand
+  // sa propre page le contredit.
   const schema = readSchemaAvailability(fetched.html);
+  if (schema === true) {
+    const contradiction = OUT_OF_STOCK_PHRASES.find((p) => hasPhrase(textWords, p));
+    if (contradiction) {
+      return {
+        inStock: null,
+        reason:
+          `Donnees du marchand contradictoires : schema.org annonce InStock ` +
+          `mais la page affiche "${contradiction}". Ajoute "in_stock_when" pour ce site.`,
+        confidence: 'none',
+      };
+    }
+  }
   if (schema !== null) {
     return {
       inStock: schema,

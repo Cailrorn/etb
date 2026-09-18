@@ -177,3 +177,29 @@ test('visibleTextLength ignore scripts et balises', async () => {
 });
 
 
+
+test('schema.org InStock contredit par la page ne declenche pas de fausse alerte', () => {
+  // Cas reel : un marchand a publie InStock sur une fiche affichant
+  // "Non disponible actuellement", provoquant une alerte d'achat injustifiee.
+  const html = '<script type="application/ld+json">{"availability":"https://schema.org/InStock"}</script>' +
+    '<html><body><p>Non disponible actuellement</p><button>Ajouter au panier</button></body></html>';
+  const r = detect(site(), { html });
+  assert.equal(r.inStock, null, 'ne doit surtout pas conclure "en stock"');
+  assert.match(r.reason, /contradictoires/);
+});
+
+test('schema.org InStock non contredit reste fiable', () => {
+  const html = '<script type="application/ld+json">{"availability":"https://schema.org/InStock"}</script>' +
+    '<html><body><p>Expedition sous 24h</p><button>Ajouter au panier</button></body></html>';
+  const r = detect(site(), { html });
+  assert.equal(r.inStock, true);
+  assert.equal(r.confidence, 'high');
+});
+
+test('une regle explicite prime sur la contradiction schema.org', () => {
+  // Un site au balisage douteux doit rester surveillable via ses propres regles.
+  const rules = { present: [], absent: ['Non disponible actuellement'], selector_exists: [], selector_absent: [], regex: null };
+  const html = '<script type="application/ld+json">{"availability":"https://schema.org/InStock"}</script>' +
+    '<html><body><p>Expedition sous 24h</p></body></html>';
+  assert.equal(detect(site({ rules }), { html }).inStock, true);
+});
