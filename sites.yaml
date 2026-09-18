@@ -78,6 +78,10 @@ sites:
     url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-collection-poster-0196214147225.html"
     mode: http
 
+  - name: "1001hobbies — Coffret Poster"
+    url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892555-pokemon-company-bm-258860-pokemon-30eme-anniversaire-collection-po-196214147225.html"
+    mode: http
+
   # King Jouet ne publie pas l'EAN : identité vérifiée par le titre de la page.
   - name: "King Jouet — Coffret Poster"
     url: "https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034914-pokemon-30-ans-coffret-poster.htm"
