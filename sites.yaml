@@ -237,3 +237,52 @@ sites:
 #   scope: "#zone-produit"        -> limiter l'analyse à une zone de la page
 #   headers: { Cookie: "..." }    -> en-têtes HTTP supplémentaires
 #   in_stock_when: { absent: ["Rupture de stock"] }   -> règle explicite
+
+  # ---------------------------------------------------------------------------
+  # TÉMOINS DE DÉTECTION
+  #
+  # Ces entrées ne sont pas des articles à acheter. Ce sont des produits censés
+  # rester disponibles en permanence : tant qu'ils remontent 🟢, la détection
+  # sait encore dire « disponible » chez ce marchand.
+  #
+  # Ils couvrent la panne la plus dangereuse du système : une règle ou un
+  # balisage qui ne sait plus répondre que « rupture ». Le site répond, la page
+  # est lisible, aucun échec n'est signalé — et pourtant aucun réappro ne serait
+  # jamais annoncé. Rien d'autre ne détecte ce cas.
+  #
+  # Chaque témoin utilise LA MÊME méthode de détection que les articles du même
+  # marchand : sinon il validerait un chemin de code qui n'est pas celui utilisé.
+  #
+  # Si un témoin bascule, deux causes possibles : le produit est réellement parti
+  # en rupture — il faut le remplacer — ou la détection est cassée.
+  # ---------------------------------------------------------------------------
+
+  # Même règle explicite que les 4 articles 1001hobbies.
+  - name: "TÉMOIN 1001hobbies"
+    url: "https://www.1001hobbies.fr/maquettes-motos/249189-tamiya-tami14131-kawasaki-ninja-h2r-4950344141319.html"
+    mode: http
+    expect: in_stock
+    in_stock_when:
+      absent: ["Non disponible actuellement"]
+
+  # Même règle explicite que les 2 articles Philibert.
+  - name: "TÉMOIN Philibert"
+    url: "https://www.philibertnet.com/fr/pokemon/182164-pokemon-true-illusion-booster-6977321125771.html"
+    mode: browser
+    wait_ms: 6000
+    expect: in_stock
+    in_stock_when:
+      present: ["Ajouter au panier"]
+      absent: ["Prévenez-moi lorsque le produit est disponible"]
+
+  # Détection par schema.org, comme les 4 articles JouéClub.
+  - name: "TÉMOIN JouéClub"
+    url: "https://www.joueclub.fr/pokemon/-pokemon-pokebox-mega-clair-de-lune-ectoplasma-0196214139121.html"
+    mode: http
+    expect: in_stock
+
+  # Détection par schema.org, comme les 4 articles La Grande Récré.
+  - name: "TÉMOIN La Grande Récré"
+    url: "https://www.lagranderecre.fr/jouets-d-eveil-et-peluches/jouets-d-eveil/porteur-auto-winnie-l-ourson.html"
+    mode: http
+    expect: in_stock

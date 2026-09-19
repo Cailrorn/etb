@@ -5,7 +5,7 @@ import { detect } from './detect.js';
 import { loadState, saveState, siteState } from './state.js';
 import {
   sendTelegram, backInStockMessage, outOfStockMessage, errorMessage, heartbeatMessage,
-  undetectableMessage,
+  undetectableMessage, canaryMessage,
 } from './notify.js';
 
 const args = new Set(process.argv.slice(2));
@@ -115,6 +115,37 @@ async function checkAll(sites, config, state, results, alerts) {
     const icon = verdict.inStock === true ? '🟢' : verdict.inStock === false ? '⚪' : '❓';
     log(`${icon} ${site.name} — ${verdict.inStock === null ? 'indetermine' : verdict.inStock ? 'EN STOCK' : 'indisponible'}`);
     debug(`source=${result.source} confiance=${verdict.confidence} · ${verdict.reason}`);
+
+    // Un temoin ne declenche jamais d'alerte d'achat : il est cense etre
+    // disponible en permanence. Sa seule raison d'etre est de crier quand il
+    // cesse de l'etre, car c'est alors la detection qui est cassee, pas le
+    // stock. C'est le seul garde-fou contre une regle devenue incapable de
+    // repondre "disponible" — panne totalement silencieuse autrement.
+    if (site.expect) {
+      const attendu = site.expect === 'in_stock';
+      const conforme = verdict.inStock === attendu;
+      const ecarts = conforme ? 0 : (prev.mismatches ?? 0) + 1;
+      const due = !conforme && problemAlertDue(prev, ecarts, config.settings);
+
+      if (due) {
+        alerts.push({ id: site.id, prev, message: canaryMessage(site, verdict, ecarts) });
+      }
+
+      state.sites[site.id] = {
+        ...prev,
+        inStock: verdict.inStock,
+        mismatches: ecarts,
+        failures: 0,
+        unknowns: 0,
+        lastError: null,
+        lastCheck: nowIso(),
+        lastReason: verdict.reason,
+        confidence: verdict.confidence,
+        lastProblemAlert: due ? nowIso() : ecarts > 0 ? prev.lastProblemAlert ?? null : null,
+        url: site.url,
+      };
+      return;
+    }
 
     const changed = verdict.inStock !== null && verdict.inStock !== prev.inStock;
 

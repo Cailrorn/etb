@@ -95,13 +95,28 @@ export function errorMessage(site, failures, lastError) {
 }
 
 export function heartbeatMessage(sites, results) {
+  const articles = sites.filter((s) => !s.expect);
+  const temoins = sites.filter((s) => s.expect);
+
   const lines = ['💓 <b>Surveillance active</b>', ''];
-  for (const site of sites) {
+  for (const site of articles) {
     const r = results.get(site.id);
     const icon = r?.inStock === true ? '🟢' : r?.inStock === false ? '⚪' : '❓';
     lines.push(`${icon} ${escapeHtml(site.name)}`);
   }
-  lines.push('', `<i>${sites.length} article(s) surveille(s).</i>`);
+  lines.push('', `<i>${articles.length} article(s) surveille(s).</i>`);
+
+  // Les temoins ne sont pas des articles a acheter : on ne les liste pas, on
+  // resume leur sante. C'est la ligne qui dit si la detection marche encore.
+  if (temoins.length > 0) {
+    const ok = temoins.filter((s) => results.get(s.id)?.inStock === (s.expect === 'in_stock'));
+    const icon = ok.length === temoins.length ? '✅' : '🧭';
+    lines.push(`<i>${icon} Temoins de detection : ${ok.length}/${temoins.length} conformes.</i>`);
+    for (const s of temoins.filter((t) => !ok.includes(t))) {
+      lines.push(`   ⚠️ ${escapeHtml(s.name)}`);
+    }
+  }
+
   return lines.join('\n');
 }
 
@@ -117,5 +132,32 @@ export function undetectableMessage(site, count, reason) {
     '',
     'Ce site ne te previendra pas d\'un retour en stock tant que ce n\'est pas corrige.',
     `<a href="${escapeHtml(site.url)}">Verifier la page manuellement</a>`,
+  ].join('\n');
+}
+
+/**
+ * Un temoin de detection a cesse de repondre comme attendu.
+ *
+ * Ce message ne parle pas de stock mais de fiabilite : si la detection ne sait
+ * plus dire "disponible" chez un marchand, aucun retour en stock n'y sera
+ * jamais signale, et rien d'autre ne le ferait savoir.
+ */
+export function canaryMessage(site, result, count) {
+  const etat = result.inStock === true ? 'disponible'
+    : result.inStock === false ? 'indisponible' : 'indetermine';
+
+  return [
+    '🧭 <b>DETECTION PEUT-ETRE CASSEE</b>',
+    '',
+    `Le temoin <b>${escapeHtml(site.name)}</b> devrait etre disponible en permanence.`,
+    `Il est vu « ${escapeHtml(etat)} » depuis ${count} passage(s).`,
+    '',
+    `Motif : ${escapeHtml(result.reason)}`,
+    '',
+    'Deux explications : ce produit temoin est reellement parti en rupture, et il',
+    'faut le remplacer ; ou la detection ne fonctionne plus chez ce marchand, et',
+    'aucun retour en stock n\'y sera signale.',
+    '',
+    `<a href="${escapeHtml(site.url)}">Verifier la page du temoin</a>`,
   ].join('\n');
 }

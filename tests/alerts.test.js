@@ -134,3 +134,50 @@ test('--only ne purge pas les autres sites', () => {
   const after = JSON.parse(readFileSync(statePath, 'utf8'));
   assert.ok(after.sites['autre-site'], 'l historique des autres sites doit survivre');
 });
+
+// --- Temoins de detection --------------------------------------------------
+
+const TEMOIN = `
+settings:
+  heartbeat_hours: 0
+  error_alert_after: 3
+  error_repeat_hours: 12
+  retries: 0
+sites:
+  - name: "Temoin livre"
+    url: "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
+    mode: http
+    expect: in_stock
+    in_stock_when:
+      present: ["In stock"]
+`;
+
+const TEMOIN_CASSE = TEMOIN.replace('present: ["In stock"]', 'present: ["Texte qui n existe pas"]');
+const etatTemoin = (o) => ({ version: 1, lastHeartbeat: null, sites: { 'temoin-livre': o } });
+
+test('un temoin conforme n envoie aucune alerte d achat', () => {
+  // Le temoin est disponible en permanence : sans traitement particulier, il
+  // declencherait une alerte "de nouveau en stock" a chaque nouvelle install.
+  const { out, state } = run(TEMOIN, etatTemoin({ inStock: null, failures: 0 }));
+  assert.equal(out.includes('EN STOCK'), true, 'il doit bien etre vu disponible');
+  assert.equal(out.includes('DE NOUVEAU EN STOCK'), false, 'mais ne jamais alerter');
+  assert.match(out, /Aucun changement/);
+  assert.equal(state.sites['temoin-livre'].mismatches, 0);
+});
+
+test('un temoin qui cesse d etre disponible finit par alerter', () => {
+  // Regle volontairement cassee : c'est la panne silencieuse qu'on veut voir.
+  const { out } = run(TEMOIN_CASSE, etatTemoin({ inStock: true, mismatches: 2, lastProblemAlert: null }));
+  assert.match(out, /DETECTION PEUT-ETRE CASSEE/);
+});
+
+test('un temoin casse n alerte pas avant le seuil', () => {
+  const { out, state } = run(TEMOIN_CASSE, etatTemoin({ inStock: true, mismatches: 0, lastProblemAlert: null }));
+  assert.equal(out.includes('DETECTION PEUT-ETRE CASSEE'), false);
+  assert.equal(state.sites['temoin-livre'].mismatches, 1);
+});
+
+test('un temoin redevenu conforme remet son compteur a zero', () => {
+  const { state } = run(TEMOIN, etatTemoin({ inStock: false, mismatches: 7, lastProblemAlert: new Date().toISOString() }));
+  assert.equal(state.sites['temoin-livre'].mismatches, 0);
+});

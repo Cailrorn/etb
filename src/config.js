@@ -46,6 +46,13 @@ export function loadConfig(path = 'sites.yaml') {
       throw new Error(`${where} : mode "${mode}" inconnu (auto | http | browser | shopify).`);
     }
 
+    // Temoin de detection : verdict attendu en permanence. Sert a prouver, a
+    // chaque passage, que la detection sait encore repondre "disponible" chez
+    // ce marchand. Sans lui, une regle cassee resterait muette a jamais.
+    if (site.expect !== undefined && !['in_stock', 'out_of_stock'].includes(site.expect)) {
+      throw new Error(`${where} : expect "${site.expect}" inconnu (in_stock | out_of_stock).`);
+    }
+
     return {
       ...DEFAULTS,
       ...globals,
