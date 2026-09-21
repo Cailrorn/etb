@@ -227,25 +227,63 @@ Le script ne pingue **pas** quand un envoi Telegram a échoué. Le watchdog sert
 
 ## Sites actuellement surveillés
 
-Coffret Dresseur d'Élite Pokémon 30e anniversaire (EAN `196214144835`). Chaque site a été testé en conditions réelles le 17/09/2026 — tous en rupture à cette date. Les URL ont été nettoyées de leurs paramètres de tracking (`aecid`, `ae`, `idOffre`), sans effet sur la page servie.
+Quatre articles Pokémon 30ᵉ anniversaire :
 
-| Site | Mode | Détection | État |
-|---|---|---|---|
-| King Jouet | `http` | schema.org `OutOfStock` | ✅ fiable |
-| 1001hobbies | `http` | schema.org `OutOfStock` | ✅ fiable |
-| JouéClub | `http` | schema.org `OutOfStock` | ✅ fiable |
-| La Grande Récré | `http` | schema.org `OutOfStock` | ✅ fiable |
-| Carrefour | `browser` | schema.org `OutOfStock` | ✅ fiable (403 en HTTP simple) |
-| Cdiscount | `browser` | schema.org `OutOfStock` | ✅ fiable (page JS en HTTP simple) |
-| Fnac | — | — | ❌ désactivé, mur anti-bot |
+| Article | EAN |
+|---|---|
+| Coffret Dresseur d'Élite (ETB) | `196214144835` |
+| Coffret Collection Poster | `196214147225` |
+| Coffret 4 boosters Nymphali-ex | `196214147102` |
+| Coffret 4 boosters Amphinobi-ex | `196214147164` |
 
-Un passage complet sur les six sites prend environ 9 secondes, largement sous le quota GitHub Actions.
+### Couverture par boutique
 
-**Pourquoi la Fnac est désactivée.** Le site sert une page de challenge DataDome (`geo.captcha-delivery.com`) à la place de la fiche produit — en HTTP simple comme en navigateur, et y compris depuis une IP résidentielle. Passer ce mur reviendrait à contourner un captcha : ce n'est pas fait ici. La page produit Fnac propose un bouton **« Alerte disponibilité »** qui envoie un mail au restock — c'est la bonne solution pour ce marchand.
+| Boutique | ETB | Poster | Nymphali-ex | Amphinobi-ex |
+|---|---|---|---|---|
+| **1001hobbies** | ✅ actif | ✅ actif | ✅ actif | ✅ actif |
+| **Carrefour** | ✅ actif | ✅ actif | ✅ actif | ✅ actif |
+| **JouéClub** | ✅ actif | ✅ actif | ✅ actif | ✅ actif |
+| **King Jouet** | ✅ actif | ✅ actif | ✅ actif | ✅ actif |
+| **Cdiscount** | ✅ actif | ✅ actif | — | — |
+| **Hikaru** | ✅ actif | — | — | — |
+| **La Grande Récré** | ⛔ retiré | ⛔ retiré | ⛔ retiré | ⛔ retiré |
+| **Philibert** | — | — | ⛔ retiré | ⛔ retiré |
+| **Fnac** | 🚫 bloqué | — | — | — |
+| **Smyths** | 🚫 bloqué | 🚫 bloqué | 🚫 bloqué | 🚫 bloqué |
 
-> **À vérifier au premier run :** Carrefour et Cdiscount ont été validés depuis une connexion résidentielle. Les runners GitHub sortent sur des IP de datacenter, souvent filtrées plus durement. Lance le workflow à la main une fois et regarde les logs : si l'un des deux remonte en `403`, c'est ce filtrage. Les quatre sites en `http` ne posent aucune difficulté.
+✅ surveillé · ⛔ fiche supprimée du catalogue · 🚫 mur anti-bot · — non référencé
 
-**Le piège de 1001hobbies** mérite d'être signalé : la page affiche « Ajouter au panier » *même en rupture*, et le mot « Indisponible » se trouve ailleurs dans le DOM. Une règle naïve sur le bouton se serait trompée dans les deux sens. Ce sont les données structurées schema.org qui donnent la bonne réponse — d'où leur priorité sur l'heuristique texte.
+**19 fiches actives**, réparties sur 6 boutiques.
+
+### Ce qui est inactif, et pourquoi
+
+**⛔ La Grande Récré et Philibert — fiches supprimées.** Constaté le 21/09/2026 : ces URL ne renvoient plus d'erreur, elles redirigent vers la liste de la catégorie. Les produits ne figurent plus à leur catalogue. Une fiche supprimée ne revient pas forcément à la même adresse, donc surveiller l'ancienne URL ne servirait à rien. **Quand une fiche réapparaît, ajoute simplement la nouvelle URL comme n'importe quel autre site.** Les deux boutiques gardent un témoin actif : la détection y fonctionne toujours, ce sont bien les produits qui ont disparu.
+
+**🚫 Fnac et Smyths — murs anti-bot.** La Fnac sert une page DataDome (`geo.captcha-delivery.com`), Smyths une page Imperva/Incapsula, à la place de la fiche produit — en HTTP comme en navigateur, y compris depuis une IP résidentielle. Passer ces murs reviendrait à contourner un captcha : ce n'est pas fait ici. Leurs pages produit proposent un bouton **« Alerte disponibilité »** qui envoie un mail au restock, c'est la bonne solution pour ces marchands. Les entrées restent en `enabled: false`, prêtes à être réactivées si la protection s'assouplit.
+
+### Témoins de détection
+
+| Boutique | Témoin | Articles protégés |
+|---|---|---|
+| 1001hobbies | ✅ | 4 |
+| JouéClub | ✅ | 4 |
+| La Grande Récré | ✅ | 0 *(en attente de retour des fiches)* |
+| Philibert | ✅ | 0 *(idem)* |
+| King Jouet · Carrefour · Cdiscount · Hikaru | ❌ aucun | 11 |
+
+Voir *Détecter une détection cassée* pour ce que couvrent les témoins.
+
+### Particularités à connaître
+
+**1001hobbies** publie un balisage `schema.org` peu fiable : le 18/09/2026 il annonçait `InStock` sur quatre fiches affichant « Non disponible actuellement », ce qui a déclenché une fausse alerte d'achat. Les quatre entrées de ce marchand utilisent donc une règle explicite sur le texte visible. **Ne pas revenir aux données structurées pour ce site.**
+
+**Carrefour** renvoie `403` en HTTP simple et sert un challenge Cloudflare aux IP de datacenter. Le mode navigateur lui laisse 30 secondes pour se résoudre seul, ce qui suffit depuis les runners GitHub.
+
+**Cdiscount** renvoie une page « activez JavaScript » en HTTP. Pas de captcha, simple rendu client : le mode navigateur suffit.
+
+**King Jouet** ne publie pas l'EAN sur ses fiches. Le contrôle d'identité y repose sur un fragment de titre, un cran moins strict qu'un code-barres.
+
+**Hikaru** est une boutique Shopify : la disponibilité est lue dans leur API, variante par variante, sans analyse de texte. C'est la source la plus fiable du lot.
 
 ## Limites à connaître
 
