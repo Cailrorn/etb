@@ -75,7 +75,6 @@ sites:
     identity: "196214144835"
     mode: http
 
-  # Testé OK : schema.org expose OutOfStock, aucune protection.
   # Boutique Shopify : la disponibilité est lue dans leur API, variante par
   # variante, sans analyse de texte. C'est la source la plus fiable qui soit.
   # Marchand vérifié le 2026-09-21 : SIRET 98290773500020 et RCS publiés dans
@@ -382,4 +381,17 @@ sites:
     url: "https://hikarudistribution.com/products/promo-one-piece-luffy-p-099-nike-premium-card-collection"
     identity: "luffy"
     mode: shopify
+    expect: in_stock
+
+  # Témoin Carrefour : UNO classique, produit de fond de catalogue, en stock.
+  # Même chemin que les 4 articles Carrefour : mode navigateur, challenge
+  # Cloudflare franchi, puis schema.org. Contrairement à King Jouet, aucune
+  # trace de cache CDN (pas de cf-cache-status HIT, âge nul) : le contenu est
+  # servi par le serveur, donc à jour.
+  - name: "TÉMOIN Carrefour"
+    url: "https://www.carrefour.fr/p/uno-classique-mattel-0746775036744"
+    identity: "0746775036744"
+    mode: browser
+    wait_ms: 8000
+    challenge_timeout_ms: 30000
     expect: in_stock

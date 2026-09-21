@@ -276,7 +276,8 @@ Chaque statut est un lien : ✅ et 🚫 mènent à la fiche produit, ⛔ à la c
 | Hikaru | ✅ *(fragile)* | 1 |
 | La Grande Récré | ✅ | 0 *(en attente de retour des fiches)* |
 | Philibert | ✅ | 0 *(idem)* |
-| Carrefour · Cdiscount | ❌ aucun | 6 |
+| Carrefour | ✅ | 4 |
+| Cdiscount | ❌ aucun | 2 |
 | King Jouet | ❌ impossible *(cache, voir plus haut)* | 4 |
 
 Voir *Détecter une détection cassée* pour ce que couvrent les témoins.
