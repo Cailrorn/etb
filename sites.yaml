@@ -395,3 +395,13 @@ sites:
     wait_ms: 8000
     challenge_timeout_ms: 30000
     expect: in_stock
+
+  # Témoin Cdiscount : cafetière Philips Senseo, produit de fond de catalogue.
+  # Même chemin que les 2 articles Cdiscount : mode navigateur, puis schema.org.
+  # Aucune trace de cache CDN (âge nul) : le contenu est servi à jour.
+  - name: "TÉMOIN Cdiscount"
+    url: "https://www.cdiscount.com/electromenager/petit-dejeuner-cafe/cafetiere-a-dosette-philips-senseo-csa210-61/f-1101727-phi8710103968894.html"
+    identity: "8710103968894"
+    mode: browser
+    wait_ms: 6000
+    expect: in_stock
