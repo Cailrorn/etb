@@ -241,6 +241,7 @@ Quatre articles Pokémon 30ᵉ anniversaire :
 | Boutique | ETB | Poster | Nymphali-ex | Amphinobi-ex |
 |---|---|---|---|---|
 | **1001hobbies** | [✅ actif](https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892561-pokemon-company-bm-258861-pokemon-30eme-anniversaire-elite-trainer-196214144835.html) | [✅ actif](https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892555-pokemon-company-bm-258860-pokemon-30eme-anniversaire-collection-po-196214147225.html) | [✅ actif](https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892558-pokemon-company-bm-258858-pokemon-30eme-anniversaire-coffret-nymph-196214147102.html) | [✅ actif](https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892559-pokemon-company-bm-258857-pokemon-30eme-anniversaire-coffret-amphi-196214147164.html) |
+| **Au Démon du Jeu** | [✅ actif](https://www.audemondujeu.com/article,pokemon-30ans-coffret-dresseur-d-elite-30eme-anniversaire-8-12-12690.html) | [✅ actif](https://www.audemondujeu.com/article,pokemon-30ans-coffret-poster-collection-30-ans-8-12-12689.html) | [✅ actif](https://www.audemondujeu.com/article,pokemon-30ans-coffret-nymphali-ex-8-12-12687.html) | [✅ actif](https://www.audemondujeu.com/article,pokemon-30ans-coffret-amphinobi-ex-8-12-12688.html) |
 | **Carrefour** | [✅ actif](https://www.carrefour.fr/p/cartes-a-jouer-et-a-collectionner-coffret-dresseur-d-elite-30e-anniversaire-pokemon-0196214144835) | [✅ actif](https://www.carrefour.fr/p/coffret-pokemon-collection-poster-30e-anniversaire-pokemon-0196214147225) | [✅ actif](https://www.carrefour.fr/p/coffret-pokemon-nymphali-ex-30e-anniversaire-pokemon-0196214147102) | [✅ actif](https://www.carrefour.fr/p/coffret-pokemon-amphinobi-ex-30e-anniversaire-pokemon-0196214147164) |
 | **Caverne du Gobelin** | [✅ actif](https://cavernedugobelin.fr/products/6aaa2fd9972b8) | [✅ actif](https://cavernedugobelin.fr/products/6aaa2b2ad856d) | [✅ actif](https://cavernedugobelin.fr/products/6aaa2ec07ee97) | [✅ actif](https://cavernedugobelin.fr/products/6aaa2f67e7df5) |
 | **DestockTCG** | [✅ actif](https://www.destocktcg.fr/product/30e-anniversaire-coffret-dresseur-delite-etb-pokemon-fr-1750) | [✅ actif](https://www.destocktcg.fr/product/30e-anniversaire-collection-poster-pokemon-fr-1751) | [✅ actif](https://www.destocktcg.fr/product/30e-anniversaire-coffret-nymphali-ex-pokemon-fr-1748) | [✅ actif](https://www.destocktcg.fr/product/30e-anniversaire-coffret-amphinobi-ex-pokemon-fr-1747) |
@@ -258,11 +259,11 @@ Chaque statut est un lien : ✅ et 🚫 mènent à la fiche produit, ⛔ à la c
 
 ✅ surveillé · ⚠️ surveillé, mais peu fiable · ⛔ fiche supprimée du catalogue · 🚫 mur anti-bot · — non référencé
 
-**34 fiches actives**, réparties sur 9 boutiques.
+**38 fiches actives**, réparties sur 10 boutiques.
 
 ### Ce qui est inactif, et pourquoi
 
-**⚠️ King Jouet — surveillance peu fiable.** Le site est protégé par DataDome, comme la Fnac. Les 4 fiches ne passent que parce qu'elles sont servies par le cache Cloudflare : la requête n'atteint jamais le serveur protégé. Au constat du 21/09/2026, cette copie avait **~3 h 30**, et le CDN est autorisé à la servir **30 jours**. Un réappro peut donc être détecté en retard, voire pas du tout ; et si le marchand purge son cache au moment du réappro, la requête tombe sur DataDome et remonte un échec au lieu d'une alerte de stock. Aucun correctif propre n'existe, contourner DataDome étant exclu. **Active en parallèle le bouton « Alerte disponibilité » sur chaque fiche King Jouet** et considère notre surveillance comme un signal d'appoint. Seul King Jouet est touché : les autres boutiques actives servent des pages fraîches à chaque requête (vérifié le 21/09/2026, y compris DestockTCG et Pokelite : `cf-cache-status: DYNAMIC`, aucune copie en cache).
+**⚠️ King Jouet — surveillance peu fiable.** Le site est protégé par DataDome, comme la Fnac. Les 4 fiches ne passent que parce qu'elles sont servies par le cache Cloudflare : la requête n'atteint jamais le serveur protégé. Au constat du 21/09/2026, cette copie avait **~3 h 30**, et le CDN est autorisé à la servir **30 jours**. Un réappro peut donc être détecté en retard, voire pas du tout ; et si le marchand purge son cache au moment du réappro, la requête tombe sur DataDome et remonte un échec au lieu d'une alerte de stock. Aucun correctif propre n'existe, contourner DataDome étant exclu. **Active en parallèle le bouton « Alerte disponibilité » sur chaque fiche King Jouet** et considère notre surveillance comme un signal d'appoint. Seul King Jouet est touché : les autres boutiques actives servent des pages fraîches à chaque requête (vérifié le 21/09/2026, y compris DestockTCG et Pokelite, `cf-cache-status: DYNAMIC`, et Au Démon du Jeu, `Cache-Control: no-store` : aucune copie en cache).
 
 **⛔ La Grande Récré et Philibert — fiches supprimées.** Constaté le 21/09/2026 : ces URL ne renvoient plus d'erreur, elles redirigent vers la liste de la catégorie. Les produits ne figurent plus à leur catalogue. Une fiche supprimée ne revient pas forcément à la même adresse, donc surveiller l'ancienne URL ne servirait à rien. **Quand une fiche réapparaît, ajoute simplement la nouvelle URL comme n'importe quel autre site.** Les deux boutiques gardent un témoin actif : la détection y fonctionne toujours, ce sont bien les produits qui ont disparu.
 
@@ -273,6 +274,7 @@ Chaque statut est un lien : ✅ et 🚫 mènent à la fiche produit, ⛔ à la c
 | Boutique | Témoin | Articles protégés |
 |---|---|---|
 | 1001hobbies | ✅ | 4 |
+| Au Démon du Jeu | ✅ | 4 |
 | Carrefour | ✅ | 4 |
 | Caverne du Gobelin | ✅ | 4 |
 | DestockTCG | ✅ | 4 |
@@ -284,13 +286,15 @@ Chaque statut est un lien : ✅ et 🚫 mènent à la fiche produit, ⛔ à la c
 | Philibert | ✅ | 0 *(idem)* |
 | King Jouet | ❌ impossible *(cache, voir plus haut)* | 4 |
 
-**30 des 34 fiches** sont protégées par un témoin. Les 4 restantes sont celles de King Jouet.
+**34 des 38 fiches** sont protégées par un témoin. Les 4 restantes sont celles de King Jouet.
 
 Voir *Détecter une détection cassée* pour ce que couvrent les témoins.
 
 ### Particularités à connaître
 
 **1001hobbies** publie un balisage `schema.org` peu fiable : le 18/09/2026 il annonçait `InStock` sur quatre fiches affichant « Non disponible actuellement », ce qui a déclenché une fausse alerte d'achat. Les quatre entrées de ce marchand utilisent donc une règle explicite sur le texte visible. **Ne pas revenir aux données structurées pour ce site.**
+
+**Au Démon du Jeu** cumule deux pièges. Son `schema.org` annonce `InStock` sur des fiches affichant « RUPTURE », comme chez 1001hobbies. Et le bouton « AJOUTER AU PANIER » reste présent en rupture. Seule sa classe change : `noPanier` en rupture, `ajouterPanier` quand l'article est commandable. La règle vise cette classe. Elle alerte en stock, en précommande ouverte et en « RÉASSORT » (commande acceptée avant réception) : trois cas où l'achat est possible.
 
 **Carrefour** renvoie `403` en HTTP simple et sert un challenge Cloudflare aux IP de datacenter. Le mode navigateur lui laisse 30 secondes pour se résoudre seul, ce qui suffit depuis les runners GitHub.
 

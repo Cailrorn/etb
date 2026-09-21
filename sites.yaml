@@ -542,3 +542,64 @@ sites:
     expect: in_stock
     in_stock_when:
       selector_exists: "button.single_add_to_cart_button"
+
+  # ---------------------------------------------------------------------------
+  # Au Démon du Jeu (Le Havre) — les 4 articles
+  #
+  # Marchand vérifié le 2026-09-21 : EURL NEXUS, RCS Le Havre 388 666 844,
+  # boutique physique au 140 rue Victor Hugo, publiés dans les CGV.
+  #
+  # Pages servies en HTTP simple, sans cache ni protection, EAN publié.
+  #
+  # PIÈGE DOUBLE :
+  #   · schema.org annonce InStock sur des fiches affichant « RUPTURE »,
+  #     comme chez 1001hobbies : à ne pas utiliser ;
+  #   · le bouton « AJOUTER AU PANIER » est toujours présent, même en rupture.
+  # Ce qui change réellement, c'est sa classe : « noPanier » (inactif) en
+  # rupture, « ajouterPanier » quand l'article est commandable. La règle vise
+  # cette classe. Elle répond « disponible » en stock, en précommande ouverte
+  # et en « RÉASSORT » (commande acceptée avant réception) : trois cas où
+  # l'on peut acheter, donc trois cas où il faut être alerté.
+  #
+  # Règle validée dans les deux sens le 2026-09-21 : le témoin ci-dessous,
+  # réellement en stock, répond EN STOCK ; les 4 fiches répondent rupture.
+  # ---------------------------------------------------------------------------
+
+  - name: "Au Démon du Jeu — ETB 30 ans"
+    url: "https://www.audemondujeu.com/article,pokemon-30ans-coffret-dresseur-d-elite-30eme-anniversaire-8-12-12690.html"
+    identity: "196214144835"
+    mode: http
+    in_stock_when:
+      selector_exists: "input.ajouterPanier[name=ajouterAuPanier]"
+
+  - name: "Au Démon du Jeu — Coffret Poster"
+    url: "https://www.audemondujeu.com/article,pokemon-30ans-coffret-poster-collection-30-ans-8-12-12689.html"
+    identity: "196214147225"
+    mode: http
+    in_stock_when:
+      selector_exists: "input.ajouterPanier[name=ajouterAuPanier]"
+
+  - name: "Au Démon du Jeu — Coffret Nymphali"
+    url: "https://www.audemondujeu.com/article,pokemon-30ans-coffret-nymphali-ex-8-12-12687.html"
+    identity: "196214147102"
+    mode: http
+    in_stock_when:
+      selector_exists: "input.ajouterPanier[name=ajouterAuPanier]"
+
+  - name: "Au Démon du Jeu — Coffret Amphinobi"
+    url: "https://www.audemondujeu.com/article,pokemon-30ans-coffret-amphinobi-ex-8-12-12688.html"
+    identity: "196214147164"
+    mode: http
+    in_stock_when:
+      selector_exists: "input.ajouterPanier[name=ajouterAuPanier]"
+
+  # Témoin Au Démon du Jeu : jeu de 40 cartes espagnoles, grand classique de
+  # fond de catalogue. Son EAN est partagé avec une variante noire : la
+  # référence interne précise la bonne fiche. Même règle que ci-dessus.
+  - name: "TÉMOIN Au Démon du Jeu"
+    url: "https://www.audemondujeu.com/article,jeu-40-cartes-espagnoles-baraja-española-nº1-2-0-3671.html"
+    identity: ["8420707006051", "Réf. : 03671"]
+    mode: http
+    expect: in_stock
+    in_stock_when:
+      selector_exists: "input.ajouterPanier[name=ajouterAuPanier]"
