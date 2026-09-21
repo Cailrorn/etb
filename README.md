@@ -269,6 +269,7 @@ Chaque statut est un lien : ✅ et 🚫 mènent à la fiche produit, ⛔ à la c
 | Boutique | Témoin | Articles protégés |
 |---|---|---|
 | 1001hobbies | ✅ | 4 |
+| Caverne du Gobelin | ✅ | 4 |
 | JouéClub | ✅ | 4 |
 | La Grande Récré | ✅ | 0 *(en attente de retour des fiches)* |
 | Philibert | ✅ | 0 *(idem)* |

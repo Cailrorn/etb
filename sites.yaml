@@ -302,10 +302,8 @@ sites:
   # Marchand vérifié le 2026-09-21 : SIREN 881534416, RCS Nancy, adresse postale
   # publiée dans les mentions légales.
   #
-  # RÉSERVE — la règle n'est validée que dans un sens. Les quatre fiches affichent
-  # « Rupture de stock », mais aucun produit en stock n'a pu être trouvé sur le
-  # site pour vérifier que la détection sait aussi répondre « disponible ».
-  # À revalider dès qu'un article y sera disponible.
+  # Règle validée dans les deux sens le 2026-09-21 : le témoin ci-dessous, un
+  # produit réellement en stock chez eux, répond bien EN STOCK avec cette règle.
   # ---------------------------------------------------------------------------
 
   - name: "Caverne du Gobelin — ETB 30 ans"
@@ -314,6 +312,7 @@ sites:
     mode: browser
     wait_ms: 7000
     in_stock_when:
+      present: ["Ajouter au panier"]
       absent: ["Rupture de stock"]
 
   - name: "Caverne du Gobelin — Coffret Poster"
@@ -322,6 +321,7 @@ sites:
     mode: browser
     wait_ms: 7000
     in_stock_when:
+      present: ["Ajouter au panier"]
       absent: ["Rupture de stock"]
 
   - name: "Caverne du Gobelin — Coffret Nymphali"
@@ -330,6 +330,7 @@ sites:
     mode: browser
     wait_ms: 7000
     in_stock_when:
+      present: ["Ajouter au panier"]
       absent: ["Rupture de stock"]
 
   - name: "Caverne du Gobelin — Coffret Amphinobi"
@@ -338,4 +339,18 @@ sites:
     mode: browser
     wait_ms: 7000
     in_stock_when:
+      present: ["Ajouter au panier"]
+      absent: ["Rupture de stock"]
+
+  # Témoin Caverne du Gobelin : produit durablement en stock, même règle que
+  # les 4 articles ci-dessus. C'est lui qui prouve, à chaque passage, que la
+  # détection sait encore répondre « disponible » chez ce marchand.
+  - name: "TÉMOIN Caverne du Gobelin"
+    url: "https://cavernedugobelin.fr/products/6a7150180f857"
+    identity: "2PACKCHECK06"
+    mode: browser
+    wait_ms: 7000
+    expect: in_stock
+    in_stock_when:
+      present: ["Ajouter au panier"]
       absent: ["Rupture de stock"]
