@@ -58,16 +58,6 @@ sites:
     mode: http
 
   # Testé OK : schema.org expose OutOfStock, aucune protection.
-  # DÉSACTIVÉ le 2026-09-21 — fiche retirée du catalogue du marchand.
-  # L'URL ne renvoie plus une erreur : elle redirige vers la liste de la
-  # catégorie. Sans contrôle d'identité, la détection y lisait la
-  # disponibilité d'autres articles. Réactiver seulement avec une URL valide.
-  - name: "La Grande Récré — ETB 30 ans"
-    url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-dresseur-d-elite-pokemon-30e-anniversaire.html"
-    identity: "196214144835"
-    mode: http
-    enabled: false
-
   # Validé depuis GitHub : fonctionne aussi depuis les IP de datacenter.
   # Testé : en HTTP simple, Cdiscount renvoie une page "activez JavaScript".
   # Pas de captcha, juste un rendu client : le mode navigateur suffit.
@@ -111,16 +101,6 @@ sites:
     identity: "coffret poster"
     mode: http
 
-  # DÉSACTIVÉ le 2026-09-21 — fiche retirée du catalogue du marchand.
-  # L'URL ne renvoie plus une erreur : elle redirige vers la liste de la
-  # catégorie. Sans contrôle d'identité, la détection y lisait la
-  # disponibilité d'autres articles. Réactiver seulement avec une URL valide.
-  - name: "La Grande Récré — Coffret Poster"
-    url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-collection-poster-pokemon-30e-anniversaire.html"
-    identity: "196214147225"
-    mode: http
-    enabled: false
-
   - name: "Cdiscount — Coffret Poster"
     url: "https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-30-ans-coffret-poster-30eme-anniversaire/f-120791604-pok196214147225.html"
     identity: "196214147225"
@@ -157,16 +137,6 @@ sites:
     identity: "coffret nymphali-ex"
     mode: http
 
-  # DÉSACTIVÉ le 2026-09-21 — fiche retirée du catalogue du marchand.
-  # L'URL ne renvoie plus une erreur : elle redirige vers la liste de la
-  # catégorie. Sans contrôle d'identité, la détection y lisait la
-  # disponibilité d'autres articles. Réactiver seulement avec une URL valide.
-  - name: "La Grande Récré — Coffret Nymphali"
-    url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-4-boosters-nymphali-ex-pokemon-30e-anniversaire.html"
-    identity: "196214147102"
-    mode: http
-    enabled: false
-
   - name: "Carrefour — Coffret Nymphali"
     url: "https://www.carrefour.fr/p/coffret-pokemon-nymphali-ex-30e-anniversaire-pokemon-0196214147102"
     identity: "196214147102"
@@ -180,20 +150,6 @@ sites:
   # sur un produit Philibert réellement disponible, pas seulement "rupture" ici.
   #   en rupture : "À VENIR : SEPTEMBRE" + "Prévenez-moi lorsque le produit…"
   #   en stock   : bouton "Ajouter au panier" + "En stock"
-  # DÉSACTIVÉ le 2026-09-21 — fiche retirée du catalogue du marchand.
-  # L'URL ne renvoie plus une erreur : elle redirige vers la liste de la
-  # catégorie. Sans contrôle d'identité, la détection y lisait la
-  # disponibilité d'autres articles. Réactiver seulement avec une URL valide.
-  - name: "Philibert — Coffret Nymphali"
-    url: "https://www.philibertnet.com/fr/pokemon/182497-pokemon-30-ans-coffret-nymphali-ex-196214147102.html"
-    identity: "196214147102"
-    mode: browser
-    enabled: false
-    wait_ms: 6000
-    in_stock_when:
-      present: ["Ajouter au panier"]
-      absent: ["Prévenez-moi lorsque le produit est disponible"]
-
   # -------------------------------------------------------------------------
   # Coffret 4 boosters Amphinobi-ex — EAN 196214147164
   # Les quatre liens testés le 2026-09-18 : bon produit, bon EAN, en rupture.
@@ -217,16 +173,6 @@ sites:
     identity: "coffret amphinobi-ex"
     mode: http
 
-  # DÉSACTIVÉ le 2026-09-21 — fiche retirée du catalogue du marchand.
-  # L'URL ne renvoie plus une erreur : elle redirige vers la liste de la
-  # catégorie. Sans contrôle d'identité, la détection y lisait la
-  # disponibilité d'autres articles. Réactiver seulement avec une URL valide.
-  - name: "La Grande Récré — Coffret Amphinobi"
-    url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-4-boosters-amphinobi-ex-pokemon-30e-anniversaire.html"
-    identity: "196214147164"
-    mode: http
-    enabled: false
-
   - name: "Carrefour — Coffret Amphinobi"
     url: "https://www.carrefour.fr/p/coffret-pokemon-amphinobi-ex-30e-anniversaire-pokemon-0196214147164"
     identity: "196214147164"
@@ -235,20 +181,6 @@ sites:
     challenge_timeout_ms: 30000
 
   # Voir la note sur Philibert plus haut (Coffret Nymphali).
-  # DÉSACTIVÉ le 2026-09-21 — fiche retirée du catalogue du marchand.
-  # L'URL ne renvoie plus une erreur : elle redirige vers la liste de la
-  # catégorie. Sans contrôle d'identité, la détection y lisait la
-  # disponibilité d'autres articles. Réactiver seulement avec une URL valide.
-  - name: "Philibert — Coffret Amphinobi"
-    url: "https://www.philibertnet.com/fr/pokemon/182496-pokemon-30-ans-coffret-amphinobi-ex-196214147164.html"
-    identity: "196214147164"
-    mode: browser
-    enabled: false
-    wait_ms: 6000
-    in_stock_when:
-      present: ["Ajouter au panier"]
-      absent: ["Prévenez-moi lorsque le produit est disponible"]
-
   # -------------------------------------------------------------------------
   # Smyths Toys — DÉSACTIVÉ, mur anti-bot Imperva / Incapsula
   #
@@ -349,3 +281,73 @@ sites:
     identity: "Porteur auto Winnie"
     mode: http
     expect: in_stock
+
+  # ---------------------------------------------------------------------------
+  # VEILLES CATÉGORIE — articles dont la fiche a été retirée du catalogue
+  #
+  # Une fiche supprimée ne revient pas forcément à la même adresse : surveiller
+  # son ancienne URL ne servirait à rien. On surveille donc la page catégorie du
+  # marchand, qui ne disparaît pas, en y cherchant le nom exact du coffret.
+  # Dès qu'il est remis en ligne, le nom apparaît et l'alerte part.
+  #
+  # Validé le 2026-09-21 dans les deux sens : des produits réellement listés
+  # dans ces mêmes catégories répondent bien EN STOCK avec le même mécanisme.
+  #
+  # Les phrases sont volontairement longues. Le rapprochement se fait sur une
+  # suite de mots, donc "boosters amphinobi ex pokemon 30e" ne matche pas
+  # "Coffret Collection Premium Méga-Amphinobi ex", qui est un autre article.
+  #
+  # Deux limites : l'alerte signale une remise en ligne, pas une disponibilité —
+  # il faudra cliquer pour vérifier. Et chez Philibert, qui compte 138 produits,
+  # un article ne serait vu que s'il apparaît en première page ; la catégorie est
+  # triée par nouveautés, ce qui joue en notre faveur. La Grande Récré n'a que
+  # 31 produits, donc aucun risque de ce côté.
+  # ---------------------------------------------------------------------------
+
+  - name: "VEILLE La Grande Récré — ETB 30 ans"
+    url: "https://www.lagranderecre.fr/cartes-a-collectionner/"
+    identity: "cartes a collectionner"
+    mode: browser
+    wait_ms: 7000
+    in_stock_when:
+      present: ["dresseur d'elite pokemon 30e"]
+
+  - name: "VEILLE La Grande Récré — Coffret Poster"
+    url: "https://www.lagranderecre.fr/cartes-a-collectionner/"
+    identity: "cartes a collectionner"
+    mode: browser
+    wait_ms: 7000
+    in_stock_when:
+      present: ["collection poster pokemon 30e"]
+
+  - name: "VEILLE La Grande Récré — Coffret Nymphali"
+    url: "https://www.lagranderecre.fr/cartes-a-collectionner/"
+    identity: "cartes a collectionner"
+    mode: browser
+    wait_ms: 7000
+    in_stock_when:
+      present: ["boosters nymphali ex pokemon 30e"]
+
+  - name: "VEILLE La Grande Récré — Coffret Amphinobi"
+    url: "https://www.lagranderecre.fr/cartes-a-collectionner/"
+    identity: "cartes a collectionner"
+    mode: browser
+    wait_ms: 7000
+    in_stock_when:
+      present: ["boosters amphinobi ex pokemon 30e"]
+
+  - name: "VEILLE Philibert — Coffret Nymphali"
+    url: "https://www.philibertnet.com/fr/212-pokemon"
+    identity: "pokemon"
+    mode: browser
+    wait_ms: 7000
+    in_stock_when:
+      present: ["30 ans coffret nymphali-ex"]
+
+  - name: "VEILLE Philibert — Coffret Amphinobi"
+    url: "https://www.philibertnet.com/fr/212-pokemon"
+    identity: "pokemon"
+    mode: browser
+    wait_ms: 7000
+    in_stock_when:
+      present: ["30 ans coffret amphinobi-ex"]
