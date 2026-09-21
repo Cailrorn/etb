@@ -423,3 +423,62 @@ sites:
     mode: browser
     wait_ms: 6000
     expect: in_stock
+
+  # ---------------------------------------------------------------------------
+  # DestockTCG — les 4 articles
+  #
+  # Marchand vérifié le 2026-09-21 : RCS Toulouse 984 044 461, mentions légales
+  # complètes. Pages servies en HTTP simple, sans protection, EAN publié sur
+  # chaque fiche.
+  #
+  # PIÈGE : le bouton « Ajouter au panier » est TOUJOURS présent dans le HTML,
+  # même en rupture. Il est seulement masqué par la classe CSS d-none. Une
+  # règle sur le texte le verrait partout et crierait au stock en permanence.
+  # Le schema.org (InStoreOnly) ne dit rien d'utile non plus.
+  # La règle porte donc sur le bouton VISIBLE, c'est-à-dire sans d-none.
+  #
+  # Deux états non commandables répondent correctement « indisponible » :
+  #   rupture              : bouton masqué + « Produit temporairement indisponible »
+  #   précommande fermée   : aucun bouton + « Prévenez-moi de l'ouverture… »
+  #
+  # Règle validée dans les deux sens le 2026-09-21 : le témoin ci-dessous,
+  # réellement en stock, répond EN STOCK ; les 4 fiches répondent rupture.
+  # ---------------------------------------------------------------------------
+
+  - name: "DestockTCG — ETB 30 ans"
+    url: "https://www.destocktcg.fr/product/30e-anniversaire-coffret-dresseur-delite-etb-pokemon-fr-1750"
+    identity: "196214144835"
+    mode: http
+    in_stock_when:
+      selector_exists: "#submitBasketAdd:not(.d-none)"
+
+  - name: "DestockTCG — Coffret Poster"
+    url: "https://www.destocktcg.fr/product/30e-anniversaire-collection-poster-pokemon-fr-1751"
+    identity: "196214147225"
+    mode: http
+    in_stock_when:
+      selector_exists: "#submitBasketAdd:not(.d-none)"
+
+  - name: "DestockTCG — Coffret Nymphali"
+    url: "https://www.destocktcg.fr/product/30e-anniversaire-coffret-nymphali-ex-pokemon-fr-1748"
+    identity: "196214147102"
+    mode: http
+    in_stock_when:
+      selector_exists: "#submitBasketAdd:not(.d-none)"
+
+  - name: "DestockTCG — Coffret Amphinobi"
+    url: "https://www.destocktcg.fr/product/30e-anniversaire-coffret-amphinobi-ex-pokemon-fr-1747"
+    identity: "196214147164"
+    mode: http
+    in_stock_when:
+      selector_exists: "#submitBasketAdd:not(.d-none)"
+
+  # Témoin DestockTCG : protections plastiques pour ETB, accessoire de fond de
+  # catalogue, en stock sans mention « stock faible ». Même règle que ci-dessus.
+  - name: "TÉMOIN DestockTCG"
+    url: "https://www.destocktcg.fr/product/12-protections-plastiques-pour-coffret-dresseur-delite-anti-uv-rayures-769"
+    identity: "Protections Plastiques"
+    mode: http
+    expect: in_stock
+    in_stock_when:
+      selector_exists: "#submitBasketAdd:not(.d-none)"
