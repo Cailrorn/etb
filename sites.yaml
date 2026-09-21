@@ -482,3 +482,63 @@ sites:
     expect: in_stock
     in_stock_when:
       selector_exists: "#submitBasketAdd:not(.d-none)"
+
+  # ---------------------------------------------------------------------------
+  # Pokelite — les 4 articles
+  #
+  # Marchand vérifié le 2026-09-21 : SAS POKELITE, SIRET 978 894 996 00013,
+  # RCS Thionville, siège publié dans les mentions légales.
+  #
+  # Boutique WooCommerce, servie en HTTP simple, sans protection. Aucun EAN
+  # publié : l'identité repose sur l'identifiant WordPress de la fiche
+  # (classe « postid-… » de la page), unique et stable, là où le titre porte
+  # un « ᵉ » typographique peu sûr à comparer.
+  #
+  # PIÈGE : chaque fiche affiche des produits similaires avec leur propre
+  # bouton « Ajouter au panier ». Une règle sur le texte les verrait et crierait
+  # au stock en permanence. La règle vise donc le bouton d'achat PRINCIPAL
+  # (single_add_to_cart_button), que WooCommerce ne rend que si l'article est
+  # commandable. Les précommandes ouvertes l'ont aussi : elles alerteront.
+  #
+  # Règle validée dans les deux sens le 2026-09-21 : le témoin ci-dessous,
+  # réellement en stock, répond EN STOCK ; les 4 fiches répondent rupture.
+  # ---------------------------------------------------------------------------
+
+  # Attention : l'ETB est vendu ici en lot avec une Acrylic Case Phoenix Shield.
+  - name: "Pokelite — ETB 30 ans"
+    url: "https://www.pokelite.fr/produit/etb-30%e1%b5%89-anniversaire-pokemon-me5-5/"
+    identity: "postid-38203"
+    mode: http
+    in_stock_when:
+      selector_exists: "button.single_add_to_cart_button"
+
+  - name: "Pokelite — Coffret Poster"
+    url: "https://www.pokelite.fr/produit/coffret-poster-30%e1%b5%89-anniversaire-pokemon-me5-5/"
+    identity: "postid-38209"
+    mode: http
+    in_stock_when:
+      selector_exists: "button.single_add_to_cart_button"
+
+  - name: "Pokelite — Coffret Nymphali"
+    url: "https://www.pokelite.fr/produit/coffret-nymphali-ex-30%e1%b5%89-anniversaire-pokemon-me5-5/"
+    identity: "postid-38210"
+    mode: http
+    in_stock_when:
+      selector_exists: "button.single_add_to_cart_button"
+
+  - name: "Pokelite — Coffret Amphinobi"
+    url: "https://www.pokelite.fr/produit/coffret-amphinobi-ex-30%e1%b5%89-anniversaire-pokemon-me5-5/"
+    identity: "postid-38212"
+    mode: http
+    in_stock_when:
+      selector_exists: "button.single_add_to_cart_button"
+
+  # Témoin Pokelite : Penny Sleeves Ultra Pro, consommable de fond de catalogue,
+  # « En stock » sans mention de stock faible. Même règle que ci-dessus.
+  - name: "TÉMOIN Pokelite"
+    url: "https://www.pokelite.fr/produit/penny-sleeves-x100-ultra-pro/"
+    identity: "postid-37980"
+    mode: http
+    expect: in_stock
+    in_stock_when:
+      selector_exists: "button.single_add_to_cart_button"

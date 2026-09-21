@@ -246,6 +246,7 @@ Quatre articles Pokémon 30ᵉ anniversaire :
 | **DestockTCG** | [✅ actif](https://www.destocktcg.fr/product/30e-anniversaire-coffret-dresseur-delite-etb-pokemon-fr-1750) | [✅ actif](https://www.destocktcg.fr/product/30e-anniversaire-collection-poster-pokemon-fr-1751) | [✅ actif](https://www.destocktcg.fr/product/30e-anniversaire-coffret-nymphali-ex-pokemon-fr-1748) | [✅ actif](https://www.destocktcg.fr/product/30e-anniversaire-coffret-amphinobi-ex-pokemon-fr-1747) |
 | **Hikaru** | [✅ actif](https://hikarudistribution.com/products/elite-trainer-box-30th-celebration-francais) | [✅ actif](https://hikarudistribution.com/products/coffret-collection-poster-30e-anniversaire) | [✅ actif](https://hikarudistribution.com/products/coffret-nymphali-ex-30e-anniversaire) | [✅ actif](https://hikarudistribution.com/products/coffret-amphinobi-ex-30e-anniversaire) |
 | **JouéClub** | [✅ actif](https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-dresseur-d-elite-0196214144835.html) | [✅ actif](https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-collection-poster-0196214147225.html) | [✅ actif](https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-nymphali-ex-0196214147102.html) | [✅ actif](https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-amphinobi-ex-0196214147164.html) |
+| **Pokelite** | [✅ actif](https://www.pokelite.fr/produit/etb-30%e1%b5%89-anniversaire-pokemon-me5-5/) | [✅ actif](https://www.pokelite.fr/produit/coffret-poster-30%e1%b5%89-anniversaire-pokemon-me5-5/) | [✅ actif](https://www.pokelite.fr/produit/coffret-nymphali-ex-30%e1%b5%89-anniversaire-pokemon-me5-5/) | [✅ actif](https://www.pokelite.fr/produit/coffret-amphinobi-ex-30%e1%b5%89-anniversaire-pokemon-me5-5/) |
 | **Cdiscount** | [✅ actif](https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-etb-coffret-dresseur-d-elite-30e-anniv/f-120791604-pok196214144835.html) | [✅ actif](https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-30-ans-coffret-poster-30eme-anniversaire/f-120791604-pok196214147225.html) | — | — |
 | **King Jouet** | [⚠️ peu fiable](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034916-pokemon-30-ans-coffret-dresseur-d-elite.htm) | [⚠️ peu fiable](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034914-pokemon-30-ans-coffret-poster.htm) | [⚠️ peu fiable](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034912-pokemon-30-ans-coffret-nymphali-ex.htm) | [⚠️ peu fiable](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034913-pokemon-30-ans-coffret-amphinobi-ex.htm) |
 | **La Grande Récré** | [⛔ retiré](https://www.lagranderecre.fr/cartes-a-collectionner/) | [⛔ retiré](https://www.lagranderecre.fr/cartes-a-collectionner/) | [⛔ retiré](https://www.lagranderecre.fr/cartes-a-collectionner/) | [⛔ retiré](https://www.lagranderecre.fr/cartes-a-collectionner/) |
@@ -257,7 +258,7 @@ Chaque statut est un lien : ✅ et 🚫 mènent à la fiche produit, ⛔ à la c
 
 ✅ surveillé · ⚠️ surveillé, mais peu fiable · ⛔ fiche supprimée du catalogue · 🚫 mur anti-bot · — non référencé
 
-**30 fiches actives**, réparties sur 8 boutiques.
+**34 fiches actives**, réparties sur 9 boutiques.
 
 ### Ce qui est inactif, et pourquoi
 
@@ -277,12 +278,13 @@ Chaque statut est un lien : ✅ et 🚫 mènent à la fiche produit, ⛔ à la c
 | DestockTCG | ✅ | 4 |
 | Hikaru | ✅ *(fragile)* | 4 |
 | JouéClub | ✅ | 4 |
+| Pokelite | ✅ | 4 |
 | Cdiscount | ✅ | 2 |
 | La Grande Récré | ✅ | 0 *(en attente de retour des fiches)* |
 | Philibert | ✅ | 0 *(idem)* |
 | King Jouet | ❌ impossible *(cache, voir plus haut)* | 4 |
 
-**26 des 30 fiches** sont protégées par un témoin. Les 4 restantes sont celles de King Jouet.
+**30 des 34 fiches** sont protégées par un témoin. Les 4 restantes sont celles de King Jouet.
 
 Voir *Détecter une détection cassée* pour ce que couvrent les témoins.
 
@@ -297,6 +299,8 @@ Voir *Détecter une détection cassée* pour ce que couvrent les témoins.
 **King Jouet** ne publie pas l'EAN sur ses fiches. Le contrôle d'identité y repose sur un fragment de titre, un cran moins strict qu'un code-barres.
 
 **DestockTCG** laisse le bouton « Ajouter au panier » dans le HTML même en rupture : il est seulement masqué par la classe CSS `d-none`. Une règle sur le texte le verrait partout et annoncerait du stock en permanence, et leur `schema.org` (`InStoreOnly`) ne dit rien d'utile. La règle vise donc le bouton **visible** : `#submitBasketAdd:not(.d-none)`. Elle répond aussi « indisponible » sur une précommande pas encore ouverte (aucun bouton).
+
+**Pokelite** affiche sur chaque fiche des produits similaires avec leur propre bouton « Ajouter au panier » : une règle sur le texte annoncerait du stock en permanence. La règle vise le bouton d'achat **principal** de WooCommerce (`button.single_add_to_cart_button`), rendu seulement quand l'article est commandable, précommande ouverte comprise. Pas d'EAN publié : l'identité repose sur l'identifiant WordPress de la fiche (`postid-…`). À noter : l'ETB y est vendu en lot avec une Acrylic Case Phoenix Shield.
 
 **Hikaru** est une boutique Shopify : la disponibilité est lue dans leur API, variante par variante, sans analyse de texte. C'est la source la plus fiable du lot.
 
