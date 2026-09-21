@@ -127,6 +127,12 @@ sites:
     identity: "coffret poster"
     mode: http
 
+  # Shopify : disponibilité lue dans l'API. Identité sur le titre, pas d'EAN exposé.
+  - name: "Hikaru — Coffret Poster"
+    url: "https://hikarudistribution.com/products/coffret-collection-poster-30e-anniversaire"
+    identity: "coffret collection poster"
+    mode: shopify
+
   - name: "Cdiscount — Coffret Poster"
     url: "https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-30-ans-coffret-poster-30eme-anniversaire/f-120791604-pok196214147225.html"
     identity: "196214147225"
@@ -151,6 +157,12 @@ sites:
     mode: http
     in_stock_when:
       absent: ["Non disponible actuellement"]
+
+  # Shopify : disponibilité lue dans l'API. Identité sur le titre, pas d'EAN exposé.
+  - name: "Hikaru — Coffret Nymphali"
+    url: "https://hikarudistribution.com/products/coffret-nymphali-ex-30e-anniversaire"
+    identity: "coffret nymphali ex"
+    mode: shopify
 
   - name: "JouéClub — Coffret Nymphali"
     url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-nymphali-ex-0196214147102.html"
@@ -187,6 +199,12 @@ sites:
     mode: http
     in_stock_when:
       absent: ["Non disponible actuellement"]
+
+  # Shopify : disponibilité lue dans l'API. Identité sur le titre, pas d'EAN exposé.
+  - name: "Hikaru — Coffret Amphinobi"
+    url: "https://hikarudistribution.com/products/coffret-amphinobi-ex-30e-anniversaire"
+    identity: "coffret amphinobi ex"
+    mode: shopify
 
   - name: "JouéClub — Coffret Amphinobi"
     url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-amphinobi-ex-0196214147164.html"
