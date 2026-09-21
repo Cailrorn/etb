@@ -203,3 +203,29 @@ test('une regle explicite prime sur la contradiction schema.org', () => {
     '<html><body><p>Expedition sous 24h</p></body></html>';
   assert.equal(detect(site({ rules }), { html }).inStock, true);
 });
+
+test('une fiche retiree qui redirige vers la categorie est detectee', async () => {
+  // Cas reel : Philibert et La Grande Recre renvoient la liste de la categorie
+  // quand un produit est retire. Cette liste contient d'autres articles
+  // disponibles : sans controle d'identite, on annoncerait un faux retour
+  // en stock sur un produit qui n'existe plus.
+  const { __test } = await import('../src/fetchers.js');
+  const categorie = '<html><body>Pokemon 30 ans Ajouter au panier En stock</body></html>';
+  assert.throws(
+    () => __test.assertIdentity({ identity: '196214147102' }, { html: categorie }),
+    /Fiche produit introuvable/,
+  );
+});
+
+test('un controle d identite satisfait laisse passer', async () => {
+  const { __test } = await import('../src/fetchers.js');
+  const fiche = '<html><body>EAN 196214147102 — Coffret Nymphali-ex</body></html>';
+  assert.doesNotThrow(() => __test.assertIdentity({ identity: '196214147102' }, { html: fiche }));
+  assert.doesNotThrow(() => __test.assertIdentity({}, { html: '<html></html>' }));
+});
+
+test('le controle d identite ignore la casse et les accents', async () => {
+  const { __test } = await import('../src/fetchers.js');
+  const fiche = '<html><body>Coffret Dresseur d\'ÉLITE</body></html>';
+  assert.doesNotThrow(() => __test.assertIdentity({ identity: "coffret dresseur d'elite" }, { html: fiche }));
+});

@@ -193,8 +193,42 @@ export async function fetchBrowser(site) {
   }
 }
 
+/**
+ * Verifie que la page recuperee est bien celle du produit attendu.
+ *
+ * Quand un marchand retire une fiche, son URL ne renvoie pas une erreur : elle
+ * redirige vers la liste de la categorie. Cette page contient d'autres produits,
+ * donc des boutons "Ajouter au panier" et des availability InStock. Sans ce
+ * controle, la detection y lit la disponibilite d'un article que l'utilisateur
+ * ne cherche pas, et peut annoncer un faux retour en stock.
+ *
+ * On ne se contente pas de comparer l'URL finale : une categorie renommee
+ * redirige legitimement vers la meme fiche.
+ */
+function assertIdentity(site, result) {
+  if (!site.identity) return;
+
+  const attendus = Array.isArray(site.identity) ? site.identity : [site.identity];
+  const foin = stripAccents(result.html ?? JSON.stringify(result.structured ?? {}))
+    .replace(/\s+/g, ' ');
+
+  const absents = attendus.filter((t) => !foin.includes(stripAccents(String(t))));
+  if (absents.length > 0) {
+    throw new Error(
+      `Fiche produit introuvable : ${absents.map((t) => `"${t}"`).join(', ')} absent(s) de la page. ` +
+      'Le produit a probablement ete retire du catalogue, ou son URL a change.'
+    );
+  }
+}
+
 /** Choisit la strategie, avec repli automatique en mode "auto". */
 export async function fetchSite(site) {
+  const result = await fetchByMode(site);
+  assertIdentity(site, result);
+  return result;
+}
+
+async function fetchByMode(site) {
   if (site.mode === 'shopify') return fetchShopify(site);
   if (site.mode === 'browser') return fetchBrowser(site);
   if (site.mode === 'http') return fetchHttp(site);
@@ -322,4 +356,4 @@ function looksLikeJsShell(html) {
 }
 
 // Expose les helpers internes pour les tests, sans elargir l API publique.
-export const __test = { hasUsableSignal, waitForSignal };
+export const __test = { hasUsableSignal, waitForSignal, assertIdentity };

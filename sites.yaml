@@ -23,6 +23,7 @@ sites:
   # Testé OK : schema.org expose OutOfStock, aucune protection anti-bot.
   - name: "King Jouet — ETB 30 ans"
     url: "https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034916-pokemon-30-ans-coffret-dresseur-d-elite.htm"
+    identity: "coffret dresseur d'elite"
     mode: http
 
   # ATTENTION — le balisage schema.org de 1001hobbies n'est pas fiable.
@@ -35,6 +36,7 @@ sites:
   # Ne pas revenir aux données structurées pour ce site.
   - name: "1001hobbies — ETB 30 ans"
     url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892561-pokemon-company-bm-258861-pokemon-30eme-anniversaire-elite-trainer-196214144835.html"
+    identity: "196214144835"
     mode: http
     in_stock_when:
       absent: ["Non disponible actuellement"]
@@ -44,6 +46,7 @@ sites:
   # challenge anti-bot : on lui laisse 30 s pour se résoudre seul avant d'échouer.
   - name: "Carrefour — ETB 30 ans"
     url: "https://www.carrefour.fr/p/cartes-a-jouer-et-a-collectionner-coffret-dresseur-d-elite-30e-anniversaire-pokemon-0196214144835"
+    identity: "196214144835"
     mode: browser
     wait_ms: 8000
     challenge_timeout_ms: 30000
@@ -51,12 +54,19 @@ sites:
   # Testé OK : schema.org expose OutOfStock, aucune protection.
   - name: "JouéClub — ETB 30 ans"
     url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-dresseur-d-elite-0196214144835.html"
+    identity: "196214144835"
     mode: http
 
   # Testé OK : schema.org expose OutOfStock, aucune protection.
+  # DÉSACTIVÉ le 2026-09-21 — fiche retirée du catalogue du marchand.
+  # L'URL ne renvoie plus une erreur : elle redirige vers la liste de la
+  # catégorie. Sans contrôle d'identité, la détection y lisait la
+  # disponibilité d'autres articles. Réactiver seulement avec une URL valide.
   - name: "La Grande Récré — ETB 30 ans"
     url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-dresseur-d-elite-pokemon-30e-anniversaire.html"
+    identity: "196214144835"
     mode: http
+    enabled: false
 
   # Validé depuis GitHub : fonctionne aussi depuis les IP de datacenter.
   # Testé : en HTTP simple, Cdiscount renvoie une page "activez JavaScript".
@@ -64,6 +74,7 @@ sites:
   # La page rendue affiche "Actuellement indisponible", cohérent avec schema.org.
   - name: "Cdiscount — ETB 30 ans"
     url: "https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-etb-coffret-dresseur-d-elite-30e-anniv/f-120791604-pok196214144835.html"
+    identity: "196214144835"
     mode: browser
     wait_ms: 6000
 
@@ -73,6 +84,7 @@ sites:
   # "Alerte disponibilité" sur la page produit Fnac, qui fait le même travail.
   - name: "Fnac — ETB 30 ans"
     url: "https://www.fnac.com/Cartes-a-collectionner-Pokemon-30A-Coffret-Dresseur-d-Elite/a23200296/w-4"
+    identity: "196214144835"
     mode: browser
     enabled: false
 
@@ -83,10 +95,12 @@ sites:
 
   - name: "JouéClub — Coffret Poster"
     url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-collection-poster-0196214147225.html"
+    identity: "196214147225"
     mode: http
 
   - name: "1001hobbies — Coffret Poster"
     url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892555-pokemon-company-bm-258860-pokemon-30eme-anniversaire-collection-po-196214147225.html"
+    identity: "196214147225"
     mode: http
     in_stock_when:
       absent: ["Non disponible actuellement"]
@@ -94,19 +108,28 @@ sites:
   # King Jouet ne publie pas l'EAN : identité vérifiée par le titre de la page.
   - name: "King Jouet — Coffret Poster"
     url: "https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034914-pokemon-30-ans-coffret-poster.htm"
+    identity: "coffret poster"
     mode: http
 
+  # DÉSACTIVÉ le 2026-09-21 — fiche retirée du catalogue du marchand.
+  # L'URL ne renvoie plus une erreur : elle redirige vers la liste de la
+  # catégorie. Sans contrôle d'identité, la détection y lisait la
+  # disponibilité d'autres articles. Réactiver seulement avec une URL valide.
   - name: "La Grande Récré — Coffret Poster"
     url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-collection-poster-pokemon-30e-anniversaire.html"
+    identity: "196214147225"
     mode: http
+    enabled: false
 
   - name: "Cdiscount — Coffret Poster"
     url: "https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-30-ans-coffret-poster-30eme-anniversaire/f-120791604-pok196214147225.html"
+    identity: "196214147225"
     mode: browser
     wait_ms: 6000
 
   - name: "Carrefour — Coffret Poster"
     url: "https://www.carrefour.fr/p/coffret-pokemon-collection-poster-30e-anniversaire-pokemon-0196214147225"
+    identity: "196214147225"
     mode: browser
     wait_ms: 8000
     challenge_timeout_ms: 30000
@@ -118,25 +141,35 @@ sites:
 
   - name: "1001hobbies — Coffret Nymphali"
     url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892558-pokemon-company-bm-258858-pokemon-30eme-anniversaire-coffret-nymph-196214147102.html"
+    identity: "196214147102"
     mode: http
     in_stock_when:
       absent: ["Non disponible actuellement"]
 
   - name: "JouéClub — Coffret Nymphali"
     url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-nymphali-ex-0196214147102.html"
+    identity: "196214147102"
     mode: http
 
   # King Jouet ne publie pas l'EAN : identité vérifiée par le titre de la page.
   - name: "King Jouet — Coffret Nymphali"
     url: "https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034912-pokemon-30-ans-coffret-nymphali-ex.htm"
+    identity: "coffret nymphali-ex"
     mode: http
 
+  # DÉSACTIVÉ le 2026-09-21 — fiche retirée du catalogue du marchand.
+  # L'URL ne renvoie plus une erreur : elle redirige vers la liste de la
+  # catégorie. Sans contrôle d'identité, la détection y lisait la
+  # disponibilité d'autres articles. Réactiver seulement avec une URL valide.
   - name: "La Grande Récré — Coffret Nymphali"
     url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-4-boosters-nymphali-ex-pokemon-30e-anniversaire.html"
+    identity: "196214147102"
     mode: http
+    enabled: false
 
   - name: "Carrefour — Coffret Nymphali"
     url: "https://www.carrefour.fr/p/coffret-pokemon-nymphali-ex-30e-anniversaire-pokemon-0196214147102"
+    identity: "196214147102"
     mode: browser
     wait_ms: 8000
     challenge_timeout_ms: 30000
@@ -147,9 +180,15 @@ sites:
   # sur un produit Philibert réellement disponible, pas seulement "rupture" ici.
   #   en rupture : "À VENIR : SEPTEMBRE" + "Prévenez-moi lorsque le produit…"
   #   en stock   : bouton "Ajouter au panier" + "En stock"
+  # DÉSACTIVÉ le 2026-09-21 — fiche retirée du catalogue du marchand.
+  # L'URL ne renvoie plus une erreur : elle redirige vers la liste de la
+  # catégorie. Sans contrôle d'identité, la détection y lisait la
+  # disponibilité d'autres articles. Réactiver seulement avec une URL valide.
   - name: "Philibert — Coffret Nymphali"
     url: "https://www.philibertnet.com/fr/pokemon/182497-pokemon-30-ans-coffret-nymphali-ex-196214147102.html"
+    identity: "196214147102"
     mode: browser
+    enabled: false
     wait_ms: 6000
     in_stock_when:
       present: ["Ajouter au panier"]
@@ -162,33 +201,49 @@ sites:
 
   - name: "1001hobbies — Coffret Amphinobi"
     url: "https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892559-pokemon-company-bm-258857-pokemon-30eme-anniversaire-coffret-amphi-196214147164.html"
+    identity: "196214147164"
     mode: http
     in_stock_when:
       absent: ["Non disponible actuellement"]
 
   - name: "JouéClub — Coffret Amphinobi"
     url: "https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-amphinobi-ex-0196214147164.html"
+    identity: "196214147164"
     mode: http
 
   # King Jouet ne publie pas l'EAN : identité vérifiée par le titre de la page.
   - name: "King Jouet — Coffret Amphinobi"
     url: "https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034913-pokemon-30-ans-coffret-amphinobi-ex.htm"
+    identity: "coffret amphinobi-ex"
     mode: http
 
+  # DÉSACTIVÉ le 2026-09-21 — fiche retirée du catalogue du marchand.
+  # L'URL ne renvoie plus une erreur : elle redirige vers la liste de la
+  # catégorie. Sans contrôle d'identité, la détection y lisait la
+  # disponibilité d'autres articles. Réactiver seulement avec une URL valide.
   - name: "La Grande Récré — Coffret Amphinobi"
     url: "https://www.lagranderecre.fr/jeux-de-societe/cartes-a-collectionner/coffret-4-boosters-amphinobi-ex-pokemon-30e-anniversaire.html"
+    identity: "196214147164"
     mode: http
+    enabled: false
 
   - name: "Carrefour — Coffret Amphinobi"
     url: "https://www.carrefour.fr/p/coffret-pokemon-amphinobi-ex-30e-anniversaire-pokemon-0196214147164"
+    identity: "196214147164"
     mode: browser
     wait_ms: 8000
     challenge_timeout_ms: 30000
 
   # Voir la note sur Philibert plus haut (Coffret Nymphali).
+  # DÉSACTIVÉ le 2026-09-21 — fiche retirée du catalogue du marchand.
+  # L'URL ne renvoie plus une erreur : elle redirige vers la liste de la
+  # catégorie. Sans contrôle d'identité, la détection y lisait la
+  # disponibilité d'autres articles. Réactiver seulement avec une URL valide.
   - name: "Philibert — Coffret Amphinobi"
     url: "https://www.philibertnet.com/fr/pokemon/182496-pokemon-30-ans-coffret-amphinobi-ex-196214147164.html"
+    identity: "196214147164"
     mode: browser
+    enabled: false
     wait_ms: 6000
     in_stock_when:
       present: ["Ajouter au panier"]
@@ -209,21 +264,25 @@ sites:
 
   - name: "Smyths — ETB 30 ans"
     url: "https://www.smythstoys.com/fr/fr-fr/jouets/jeux-de-societe-et-puzzles/cartes-a-collectionner/cartes-pokemon/pokemon-coffret-dresseur-delite-30eme-anniversaire/p/261821"
+    identity: "196214144835"
     mode: browser
     enabled: false
 
   - name: "Smyths — Coffret Poster"
     url: "https://www.smythstoys.com/fr/fr-fr/jouets/jeux-de-societe-et-puzzles/cartes-a-collectionner/cartes-pokemon/pokemon-coffret-collection-poster-30eme-anniversaire/p/261814"
+    identity: "196214147225"
     mode: browser
     enabled: false
 
   - name: "Smyths — Coffret Nymphali"
     url: "https://www.smythstoys.com/fr/fr-fr/jouets/jeux-de-societe-et-puzzles/cartes-a-collectionner/cartes-pokemon/pokemon-coffret-nymphali-ex-30eme-anniversaire/p/261788"
+    identity: "196214147102"
     mode: browser
     enabled: false
 
   - name: "Smyths — Coffret Amphinobi"
     url: "https://www.smythstoys.com/fr/fr-fr/jouets/jeux-de-societe-et-puzzles/cartes-a-collectionner/cartes-pokemon/pokemon-coffret-amphinobi-ex-30eme-anniversaire/p/261830"
+    identity: "196214147164"
     mode: browser
     enabled: false
 
@@ -260,6 +319,7 @@ sites:
   # Même règle explicite que les 4 articles 1001hobbies.
   - name: "TÉMOIN 1001hobbies"
     url: "https://www.1001hobbies.fr/maquettes-motos/249189-tamiya-tami14131-kawasaki-ninja-h2r-4950344141319.html"
+    identity: "4950344141319"
     mode: http
     expect: in_stock
     in_stock_when:
@@ -268,6 +328,7 @@ sites:
   # Même règle explicite que les 2 articles Philibert.
   - name: "TÉMOIN Philibert"
     url: "https://www.philibertnet.com/fr/pokemon/182164-pokemon-true-illusion-booster-6977321125771.html"
+    identity: "6977321125771"
     mode: browser
     wait_ms: 6000
     expect: in_stock
@@ -278,11 +339,13 @@ sites:
   # Détection par schema.org, comme les 4 articles JouéClub.
   - name: "TÉMOIN JouéClub"
     url: "https://www.joueclub.fr/pokemon/-pokemon-pokebox-mega-clair-de-lune-ectoplasma-0196214139121.html"
+    identity: "196214139121"
     mode: http
     expect: in_stock
 
   # Détection par schema.org, comme les 4 articles La Grande Récré.
   - name: "TÉMOIN La Grande Récré"
     url: "https://www.lagranderecre.fr/jouets-d-eveil-et-peluches/jouets-d-eveil/porteur-auto-winnie-l-ourson.html"
+    identity: "Porteur auto Winnie"
     mode: http
     expect: in_stock
