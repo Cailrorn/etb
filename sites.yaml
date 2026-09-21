@@ -354,3 +354,14 @@ sites:
     in_stock_when:
       present: ["Ajouter au panier"]
       absent: ["Rupture de stock"]
+
+  # Témoin Hikaru. Boutique Shopify, donc disponibilité lue dans leur API.
+  # FRAGILE : sur 40 produits à leur catalogue, un seul était disponible au
+  # 2026-09-21. S'il part en rupture, l'alerte « détection cassée » se
+  # déclenchera alors que la détection va bien — il faudra juste le remplacer.
+  # Le message d'alerte mentionne explicitement ces deux causes possibles.
+  - name: "TÉMOIN Hikaru"
+    url: "https://hikarudistribution.com/products/promo-one-piece-luffy-p-099-nike-premium-card-collection"
+    identity: "luffy"
+    mode: shopify
+    expect: in_stock

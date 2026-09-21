@@ -271,9 +271,10 @@ Chaque statut est un lien : ✅ et 🚫 mènent à la fiche produit, ⛔ à la c
 | 1001hobbies | ✅ | 4 |
 | Caverne du Gobelin | ✅ | 4 |
 | JouéClub | ✅ | 4 |
+| Hikaru | ✅ *(fragile)* | 1 |
 | La Grande Récré | ✅ | 0 *(en attente de retour des fiches)* |
 | Philibert | ✅ | 0 *(idem)* |
-| King Jouet · Carrefour · Cdiscount · Hikaru | ❌ aucun | 11 |
+| King Jouet · Carrefour · Cdiscount | ❌ aucun | 10 |
 
 Voir *Détecter une détection cassée* pour ce que couvrent les témoins.
 
