@@ -271,14 +271,16 @@ Chaque statut est un lien : ✅ et 🚫 mènent à la fiche produit, ⛔ à la c
 | Boutique | Témoin | Articles protégés |
 |---|---|---|
 | 1001hobbies | ✅ | 4 |
+| Carrefour | ✅ | 4 |
 | Caverne du Gobelin | ✅ | 4 |
-| JouéClub | ✅ | 4 |
 | Hikaru | ✅ *(fragile)* | 4 |
+| JouéClub | ✅ | 4 |
+| Cdiscount | ✅ | 2 |
 | La Grande Récré | ✅ | 0 *(en attente de retour des fiches)* |
 | Philibert | ✅ | 0 *(idem)* |
-| Carrefour | ✅ | 4 |
-| Cdiscount | ✅ | 2 |
 | King Jouet | ❌ impossible *(cache, voir plus haut)* | 4 |
+
+**22 des 26 fiches** sont protégées par un témoin. Les 4 restantes sont celles de King Jouet.
 
 Voir *Détecter une détection cassée* pour ce que couvrent les témoins.
 
