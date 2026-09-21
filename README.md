@@ -244,9 +244,9 @@ Quatre articles Pokémon 30ᵉ anniversaire :
 | **Carrefour** | [✅ actif](https://www.carrefour.fr/p/cartes-a-jouer-et-a-collectionner-coffret-dresseur-d-elite-30e-anniversaire-pokemon-0196214144835) | [✅ actif](https://www.carrefour.fr/p/coffret-pokemon-collection-poster-30e-anniversaire-pokemon-0196214147225) | [✅ actif](https://www.carrefour.fr/p/coffret-pokemon-nymphali-ex-30e-anniversaire-pokemon-0196214147102) | [✅ actif](https://www.carrefour.fr/p/coffret-pokemon-amphinobi-ex-30e-anniversaire-pokemon-0196214147164) |
 | **Caverne du Gobelin** | [✅ actif](https://cavernedugobelin.fr/products/6aaa2fd9972b8) | [✅ actif](https://cavernedugobelin.fr/products/6aaa2b2ad856d) | [✅ actif](https://cavernedugobelin.fr/products/6aaa2ec07ee97) | [✅ actif](https://cavernedugobelin.fr/products/6aaa2f67e7df5) |
 | **JouéClub** | [✅ actif](https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-dresseur-d-elite-0196214144835.html) | [✅ actif](https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-collection-poster-0196214147225.html) | [✅ actif](https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-nymphali-ex-0196214147102.html) | [✅ actif](https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-amphinobi-ex-0196214147164.html) |
-| **King Jouet** | [✅ actif](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034916-pokemon-30-ans-coffret-dresseur-d-elite.htm) | [✅ actif](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034914-pokemon-30-ans-coffret-poster.htm) | [✅ actif](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034912-pokemon-30-ans-coffret-nymphali-ex.htm) | [✅ actif](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034913-pokemon-30-ans-coffret-amphinobi-ex.htm) |
 | **Cdiscount** | [✅ actif](https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-etb-coffret-dresseur-d-elite-30e-anniv/f-120791604-pok196214144835.html) | [✅ actif](https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-30-ans-coffret-poster-30eme-anniversaire/f-120791604-pok196214147225.html) | — | — |
 | **Hikaru** | [✅ actif](https://hikarudistribution.com/products/elite-trainer-box-30th-celebration-francais) | — | — | — |
+| **King Jouet** | [⚠️ peu fiable](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034916-pokemon-30-ans-coffret-dresseur-d-elite.htm) | [⚠️ peu fiable](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034914-pokemon-30-ans-coffret-poster.htm) | [⚠️ peu fiable](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034912-pokemon-30-ans-coffret-nymphali-ex.htm) | [⚠️ peu fiable](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034913-pokemon-30-ans-coffret-amphinobi-ex.htm) |
 | **La Grande Récré** | [⛔ retiré](https://www.lagranderecre.fr/cartes-a-collectionner/) | [⛔ retiré](https://www.lagranderecre.fr/cartes-a-collectionner/) | [⛔ retiré](https://www.lagranderecre.fr/cartes-a-collectionner/) | [⛔ retiré](https://www.lagranderecre.fr/cartes-a-collectionner/) |
 | **Philibert** | — | — | [⛔ retiré](https://www.philibertnet.com/fr/212-pokemon) | [⛔ retiré](https://www.philibertnet.com/fr/212-pokemon) |
 | **Fnac** | [🚫 bloqué](https://www.fnac.com/Cartes-a-collectionner-Pokemon-30A-Coffret-Dresseur-d-Elite/a23200296/w-4) | — | — | — |
@@ -254,11 +254,13 @@ Quatre articles Pokémon 30ᵉ anniversaire :
 
 Chaque statut est un lien : ✅ et 🚫 mènent à la fiche produit, ⛔ à la catégorie du marchand, là où la fiche réapparaîtra.
 
-✅ surveillé · ⛔ fiche supprimée du catalogue · 🚫 mur anti-bot · — non référencé
+✅ surveillé · ⚠️ surveillé, mais peu fiable · ⛔ fiche supprimée du catalogue · 🚫 mur anti-bot · — non référencé
 
 **23 fiches actives**, réparties sur 7 boutiques.
 
 ### Ce qui est inactif, et pourquoi
+
+**⚠️ King Jouet — surveillance peu fiable.** Le site est protégé par DataDome, comme la Fnac. Les 4 fiches ne passent que parce qu'elles sont servies par le cache Cloudflare : la requête n'atteint jamais le serveur protégé. Au constat du 21/09/2026, cette copie avait **~3 h 30**, et le CDN est autorisé à la servir **30 jours**. Un réappro peut donc être détecté en retard, voire pas du tout ; et si le marchand purge son cache au moment du réappro, la requête tombe sur DataDome et remonte un échec au lieu d'une alerte de stock. Aucun correctif propre n'existe, contourner DataDome étant exclu. **Active en parallèle le bouton « Alerte disponibilité » sur chaque fiche King Jouet** et considère notre surveillance comme un signal d'appoint. Seul King Jouet est touché : 1001hobbies, JouéClub et Hikaru servent des pages fraîches à chaque requête.
 
 **⛔ La Grande Récré et Philibert — fiches supprimées.** Constaté le 21/09/2026 : ces URL ne renvoient plus d'erreur, elles redirigent vers la liste de la catégorie. Les produits ne figurent plus à leur catalogue. Une fiche supprimée ne revient pas forcément à la même adresse, donc surveiller l'ancienne URL ne servirait à rien. **Quand une fiche réapparaît, ajoute simplement la nouvelle URL comme n'importe quel autre site.** Les deux boutiques gardent un témoin actif : la détection y fonctionne toujours, ce sont bien les produits qui ont disparu.
 
@@ -274,7 +276,8 @@ Chaque statut est un lien : ✅ et 🚫 mènent à la fiche produit, ⛔ à la c
 | Hikaru | ✅ *(fragile)* | 1 |
 | La Grande Récré | ✅ | 0 *(en attente de retour des fiches)* |
 | Philibert | ✅ | 0 *(idem)* |
-| King Jouet · Carrefour · Cdiscount | ❌ aucun | 10 |
+| Carrefour · Cdiscount | ❌ aucun | 6 |
+| King Jouet | ❌ impossible *(cache, voir plus haut)* | 4 |
 
 Voir *Détecter une détection cassée* pour ce que couvrent les témoins.
 

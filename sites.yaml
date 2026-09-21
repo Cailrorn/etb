@@ -20,7 +20,25 @@ settings:
   retries: 2
 
 sites:
-  # Testé OK : schema.org expose OutOfStock, aucune protection anti-bot.
+  # ⚠️ KING JOUET — SURVEILLANCE PEU FIABLE (constaté le 2026-09-21)
+  #
+  # Le site est protégé par DataDome, comme la Fnac. Ses 4 fiches Pokémon ne
+  # passent que parce qu'elles sont populaires et servies par le cache
+  # Cloudflare (cf-cache-status: HIT) : la requête n'atteint jamais le serveur
+  # protégé. Une fiche hors cache renvoie 403 (vérifié sur un autre produit).
+  #
+  # Conséquence : on lit une copie qui avait ~3 h 30 au moment du constat, et
+  # que le CDN est autorisé à servir 30 jours (s-maxage=2592000). Un réappro
+  # peut donc être vu en retard, ou pas du tout. Et si le marchand purge le
+  # cache au moment du réappro, la requête tombe sur DataDome : 403, donc un
+  # « échec » au lieu d'une alerte de stock.
+  #
+  # Aucun correctif propre : forcer le passage par le serveur d'origine mène à
+  # DataDome, et le contourner est exclu. Pas de témoin possible non plus, un
+  # témoin en cache ne prouvant rien sur la fraîcheur des données.
+  #
+  # Conservé comme signal d'appoint : active en parallèle le bouton « Alerte
+  # disponibilité » de King Jouet sur chaque fiche.
   - name: "King Jouet — ETB 30 ans"
     url: "https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034916-pokemon-30-ans-coffret-dresseur-d-elite.htm"
     identity: "coffret dresseur d'elite"
