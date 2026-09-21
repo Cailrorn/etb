@@ -242,6 +242,7 @@ Quatre articles Pokémon 30ᵉ anniversaire :
 |---|---|---|---|---|
 | **1001hobbies** | [✅ actif](https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892561-pokemon-company-bm-258861-pokemon-30eme-anniversaire-elite-trainer-196214144835.html) | [✅ actif](https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892555-pokemon-company-bm-258860-pokemon-30eme-anniversaire-collection-po-196214147225.html) | [✅ actif](https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892558-pokemon-company-bm-258858-pokemon-30eme-anniversaire-coffret-nymph-196214147102.html) | [✅ actif](https://www.1001hobbies.fr/jeux-de-cartes-a-jouer/892559-pokemon-company-bm-258857-pokemon-30eme-anniversaire-coffret-amphi-196214147164.html) |
 | **Carrefour** | [✅ actif](https://www.carrefour.fr/p/cartes-a-jouer-et-a-collectionner-coffret-dresseur-d-elite-30e-anniversaire-pokemon-0196214144835) | [✅ actif](https://www.carrefour.fr/p/coffret-pokemon-collection-poster-30e-anniversaire-pokemon-0196214147225) | [✅ actif](https://www.carrefour.fr/p/coffret-pokemon-nymphali-ex-30e-anniversaire-pokemon-0196214147102) | [✅ actif](https://www.carrefour.fr/p/coffret-pokemon-amphinobi-ex-30e-anniversaire-pokemon-0196214147164) |
+| **Caverne du Gobelin** | [✅ actif](https://cavernedugobelin.fr/products/6aaa2fd9972b8) | [✅ actif](https://cavernedugobelin.fr/products/6aaa2b2ad856d) | [✅ actif](https://cavernedugobelin.fr/products/6aaa2ec07ee97) | [✅ actif](https://cavernedugobelin.fr/products/6aaa2f67e7df5) |
 | **JouéClub** | [✅ actif](https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-dresseur-d-elite-0196214144835.html) | [✅ actif](https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-collection-poster-0196214147225.html) | [✅ actif](https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-nymphali-ex-0196214147102.html) | [✅ actif](https://www.joueclub.fr/pokemon/pokemon-30eme-anniversaire-coffret-4-boosters-amphinobi-ex-0196214147164.html) |
 | **King Jouet** | [✅ actif](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034916-pokemon-30-ans-coffret-dresseur-d-elite.htm) | [✅ actif](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034914-pokemon-30-ans-coffret-poster.htm) | [✅ actif](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034912-pokemon-30-ans-coffret-nymphali-ex.htm) | [✅ actif](https://www.king-jouet.com/jeu-jouet/jeux-societes/cartes-a-collectionner/ref-1034913-pokemon-30-ans-coffret-amphinobi-ex.htm) |
 | **Cdiscount** | [✅ actif](https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-etb-coffret-dresseur-d-elite-30e-anniv/f-120791604-pok196214144835.html) | [✅ actif](https://www.cdiscount.com/juniors/jeux-de-societe-cartes/pokemon-30-ans-coffret-poster-30eme-anniversaire/f-120791604-pok196214147225.html) | — | — |
@@ -255,7 +256,7 @@ Chaque statut est un lien : ✅ et 🚫 mènent à la fiche produit, ⛔ à la c
 
 ✅ surveillé · ⛔ fiche supprimée du catalogue · 🚫 mur anti-bot · — non référencé
 
-**19 fiches actives**, réparties sur 6 boutiques.
+**23 fiches actives**, réparties sur 7 boutiques.
 
 ### Ce qui est inactif, et pourquoi
 

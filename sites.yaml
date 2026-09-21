@@ -290,3 +290,52 @@ sites:
     identity: "Porteur auto Winnie"
     mode: http
     expect: in_stock
+
+  # ---------------------------------------------------------------------------
+  # Caverne du Gobelin — les 4 articles
+  #
+  # Site entièrement rendu en JavaScript : 7 caractères de texte en HTTP simple,
+  # donc mode navigateur obligatoire. Aucun EAN publié : l'identité repose sur la
+  # référence interne affichée sur chaque fiche, plus fiable qu'un titre contenant
+  # des apostrophes typographiques.
+  #
+  # Marchand vérifié le 2026-09-21 : SIREN 881534416, RCS Nancy, adresse postale
+  # publiée dans les mentions légales.
+  #
+  # RÉSERVE — la règle n'est validée que dans un sens. Les quatre fiches affichent
+  # « Rupture de stock », mais aucun produit en stock n'a pu être trouvé sur le
+  # site pour vérifier que la détection sait aussi répondre « disponible ».
+  # À revalider dès qu'un article y sera disponible.
+  # ---------------------------------------------------------------------------
+
+  - name: "Caverne du Gobelin — ETB 30 ans"
+    url: "https://cavernedugobelin.fr/products/6aaa2fd9972b8"
+    identity: "POKTYAELI"
+    mode: browser
+    wait_ms: 7000
+    in_stock_when:
+      absent: ["Rupture de stock"]
+
+  - name: "Caverne du Gobelin — Coffret Poster"
+    url: "https://cavernedugobelin.fr/products/6aaa2b2ad856d"
+    identity: "POKTYAPOST"
+    mode: browser
+    wait_ms: 7000
+    in_stock_when:
+      absent: ["Rupture de stock"]
+
+  - name: "Caverne du Gobelin — Coffret Nymphali"
+    url: "https://cavernedugobelin.fr/products/6aaa2ec07ee97"
+    identity: "POKTYASEP26A"
+    mode: browser
+    wait_ms: 7000
+    in_stock_when:
+      absent: ["Rupture de stock"]
+
+  - name: "Caverne du Gobelin — Coffret Amphinobi"
+    url: "https://cavernedugobelin.fr/products/6aaa2f67e7df5"
+    identity: "POKTYASEP26B"
+    mode: browser
+    wait_ms: 7000
+    in_stock_when:
+      absent: ["Rupture de stock"]
