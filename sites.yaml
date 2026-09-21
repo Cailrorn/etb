@@ -58,6 +58,15 @@ sites:
     mode: http
 
   # Testé OK : schema.org expose OutOfStock, aucune protection.
+  # Boutique Shopify : la disponibilité est lue dans leur API, variante par
+  # variante, sans analyse de texte. C'est la source la plus fiable qui soit.
+  # Marchand vérifié le 2026-09-21 : SIRET 98290773500020 et RCS publiés dans
+  # ses mentions légales. Pas d'EAN exposé, l'identité repose donc sur le titre.
+  - name: "Hikaru — ETB 30 ans"
+    url: "https://hikarudistribution.com/products/elite-trainer-box-30th-celebration-francais"
+    identity: "coffret dresseur d'elite"
+    mode: shopify
+
   # Validé depuis GitHub : fonctionne aussi depuis les IP de datacenter.
   # Testé : en HTTP simple, Cdiscount renvoie une page "activez JavaScript".
   # Pas de captcha, juste un rendu client : le mode navigateur suffit.
