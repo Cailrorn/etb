@@ -302,7 +302,7 @@ Voir *Détecter une détection cassée* pour ce que couvrent les témoins.
 
 **King Jouet** ne publie pas l'EAN sur ses fiches. Le contrôle d'identité y repose sur un fragment de titre, un cran moins strict qu'un code-barres.
 
-**DestockTCG** refuse les requêtes HTTP venant des serveurs GitHub (), tout en répondant normalement depuis une connexion personnelle. Ses 5 entrées tournent donc en **mode navigateur**. Constaté le 22/09/2026 après 105 échecs d'affilée : une règle validée en local ne prouve rien tant qu'un passage GitHub ne l'a pas confirmée.
+**DestockTCG** refuse les requêtes HTTP venant des serveurs GitHub (`403`), tout en répondant normalement depuis une connexion personnelle. Ses 5 entrées tournent donc en **mode navigateur**. Constaté le 22/09/2026 après 105 échecs d'affilée : une règle validée en local ne prouve rien tant qu'un passage GitHub ne l'a pas confirmée.
 
 **DestockTCG** laisse le bouton « Ajouter au panier » dans le HTML même en rupture : il est seulement masqué par la classe CSS `d-none`. Une règle sur le texte le verrait partout et annoncerait du stock en permanence, et leur `schema.org` (`InStoreOnly`) ne dit rien d'utile. La règle vise donc le bouton **visible** : `#submitBasketAdd:not(.d-none)`. Elle répond aussi « indisponible » sur une précommande pas encore ouverte (aucun bouton).
 
