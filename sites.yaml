@@ -443,33 +443,47 @@ sites:
   #
   # Règle validée dans les deux sens le 2026-09-21 : le témoin ci-dessous,
   # réellement en stock, répond EN STOCK ; les 4 fiches répondent rupture.
+  #
+  # MODE NAVIGATEUR OBLIGATOIRE (constaté le 2026-09-22) : en HTTP simple, le
+  # site répond 200 depuis une IP résidentielle mais 403 depuis les runners
+  # GitHub. Les 5 entrées ont échoué 105 fois d'affilée avant ce correctif, et
+  # un vrai passage en stock du Coffret Poster n'a donc pas pu être vu.
+  # Toute règle validée en local doit être reconfirmée sur un passage GitHub.
   # ---------------------------------------------------------------------------
 
   - name: "DestockTCG — ETB 30 ans"
     url: "https://www.destocktcg.fr/product/30e-anniversaire-coffret-dresseur-delite-etb-pokemon-fr-1750"
     identity: "196214144835"
-    mode: http
+    mode: browser
+    wait_ms: 7000
+    challenge_timeout_ms: 30000
     in_stock_when:
       selector_exists: "#submitBasketAdd:not(.d-none)"
 
   - name: "DestockTCG — Coffret Poster"
     url: "https://www.destocktcg.fr/product/30e-anniversaire-collection-poster-pokemon-fr-1751"
     identity: "196214147225"
-    mode: http
+    mode: browser
+    wait_ms: 7000
+    challenge_timeout_ms: 30000
     in_stock_when:
       selector_exists: "#submitBasketAdd:not(.d-none)"
 
   - name: "DestockTCG — Coffret Nymphali"
     url: "https://www.destocktcg.fr/product/30e-anniversaire-coffret-nymphali-ex-pokemon-fr-1748"
     identity: "196214147102"
-    mode: http
+    mode: browser
+    wait_ms: 7000
+    challenge_timeout_ms: 30000
     in_stock_when:
       selector_exists: "#submitBasketAdd:not(.d-none)"
 
   - name: "DestockTCG — Coffret Amphinobi"
     url: "https://www.destocktcg.fr/product/30e-anniversaire-coffret-amphinobi-ex-pokemon-fr-1747"
     identity: "196214147164"
-    mode: http
+    mode: browser
+    wait_ms: 7000
+    challenge_timeout_ms: 30000
     in_stock_when:
       selector_exists: "#submitBasketAdd:not(.d-none)"
 
@@ -478,7 +492,9 @@ sites:
   - name: "TÉMOIN DestockTCG"
     url: "https://www.destocktcg.fr/product/12-protections-plastiques-pour-coffret-dresseur-delite-anti-uv-rayures-769"
     identity: "Protections Plastiques"
-    mode: http
+    mode: browser
+    wait_ms: 7000
+    challenge_timeout_ms: 30000
     expect: in_stock
     in_stock_when:
       selector_exists: "#submitBasketAdd:not(.d-none)"
