@@ -229,3 +229,18 @@ test('le controle d identite ignore la casse et les accents', async () => {
   const fiche = '<html><body>Coffret Dresseur d\'ÉLITE</body></html>';
   assert.doesNotThrow(() => __test.assertIdentity({ identity: "coffret dresseur d'elite" }, { html: fiche }));
 });
+
+test('l erreur d identite distingue un retrait d une page servie a la place', async () => {
+  // Cas reel : les 5 fiches d'un marchand ont echoue ensemble alors qu'aucune
+  // n'avait ete retiree — le site avait servi une page d'erreur. Le message
+  // doit donner de quoi trancher, sinon on cherche un produit disparu.
+  const { __test } = await import('../src/fetchers.js');
+  try {
+    __test.assertIdentity({ identity: '196214147225' },
+      { html: '<html><head><title>Service indisponible</title></head><body>Reessayez</body></html>' });
+    assert.fail('aurait du echouer');
+  } catch (err) {
+    assert.match(err.message, /titre "Service indisponible"/);
+    assert.match(err.message, /caracteres visibles/);
+  }
+});

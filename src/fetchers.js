@@ -213,12 +213,21 @@ function assertIdentity(site, result) {
     .replace(/\s+/g, ' ');
 
   const absents = attendus.filter((t) => !foin.includes(stripAccents(String(t))));
-  if (absents.length > 0) {
-    throw new Error(
-      `Fiche produit introuvable : ${absents.map((t) => `"${t}"`).join(', ')} absent(s) de la page. ` +
-      'Le produit a probablement ete retire du catalogue, ou son URL a change.'
-    );
-  }
+  if (absents.length === 0) return;
+
+  // Deux causes tres differentes donnent la meme absence : la fiche a ete
+  // retiree, ou le marchand a servi autre chose que la fiche (page d'erreur,
+  // blocage passager). Le titre et la taille de la page tranchent d'un coup
+  // d'oeil, sans quoi on croit a tort qu'un produit a disparu du catalogue.
+  const titre = /<title[^>]*>([\s\S]{0,120}?)<\/title>/i.exec(result.html ?? '')?.[1]
+    ?.replace(/\s+/g, ' ').trim();
+
+  throw new Error(
+    `Fiche produit introuvable : ${absents.map((t) => `"${t}"`).join(', ')} absent(s) de la page. ` +
+    'Le produit a ete retire du catalogue, ou le marchand a servi une autre page. ' +
+    `Page recue : ${visibleTextLength(result.html ?? '')} caracteres visibles` +
+    (titre ? `, titre "${titre}"` : ', sans titre') + '.'
+  );
 }
 
 /** Choisit la strategie, avec repli automatique en mode "auto". */
