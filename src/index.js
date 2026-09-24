@@ -4,8 +4,7 @@ import { fetchSite, closeBrowser } from './fetchers.js';
 import { detect } from './detect.js';
 import { loadState, saveState, siteState } from './state.js';
 import {
-  sendTelegram, backInStockMessage, outOfStockMessage, errorMessage, heartbeatMessage,
-  undetectableMessage, canaryMessage,
+  sendTelegram, backInStockMessage, outOfStockMessage, problemsMessage, heartbeatMessage,
 } from './notify.js';
 
 const args = new Set(process.argv.slice(2));
@@ -44,11 +43,12 @@ async function main() {
   const state = loadState(STATE_PATH);
   const results = new Map();
   const alerts = [];
+  const problems = [];
 
   log(`Verification de ${sites.length} article(s)${DRY_RUN ? ' [dry-run]' : ''}…\n`);
 
   try {
-    await checkAll(sites, config, state, results, alerts);
+    await checkAll(sites, config, state, results, alerts, problems);
   } finally {
     // Sans cette fermeture, le processus resterait vivant apres le dernier site.
     await closeBrowser();
@@ -58,7 +58,7 @@ async function main() {
   // seraient pris pour des orphelins et leur historique efface.
   if (!only) pruneOrphans(state, config.sites);
 
-  await finish(config, sites, state, results, alerts);
+  await finish(config, sites, state, results, alerts, problems);
 }
 
 /**
@@ -80,7 +80,7 @@ function pruneOrphans(state, activeSites) {
   return orphans;
 }
 
-async function checkAll(sites, config, state, results, alerts) {
+async function checkAll(sites, config, state, results, alerts, problems) {
   await runPool(sites, config.settings.concurrency, async (site) => {
     const prev = siteState(state, site.id);
     let result;
@@ -96,7 +96,7 @@ async function checkAll(sites, config, state, results, alerts) {
       // perdrait dans l'historique et le site resterait aveugle sans le dire.
       const due = problemAlertDue(prev, failures, config.settings);
       if (due) {
-        alerts.push({ id: site.id, prev, message: errorMessage(site, failures, err.message) });
+        problems.push({ kind: "echec", id: site.id, prev, site, count: failures, detail: err.message });
       }
 
       state.sites[site.id] = {
@@ -128,7 +128,9 @@ async function checkAll(sites, config, state, results, alerts) {
       const due = !conforme && problemAlertDue(prev, ecarts, config.settings);
 
       if (due) {
-        alerts.push({ id: site.id, prev, message: canaryMessage(site, verdict, ecarts) });
+        const etat = verdict.inStock === true ? "disponible"
+          : verdict.inStock === false ? "indisponible" : "indetermine";
+        problems.push({ kind: "temoin", id: site.id, prev, site, count: ecarts, detail: etat });
       }
 
       state.sites[site.id] = {
@@ -165,7 +167,7 @@ async function checkAll(sites, config, state, results, alerts) {
     const unknowns = verdict.inStock === null ? (prev.unknowns ?? 0) + 1 : 0;
     const due = unknowns > 0 && problemAlertDue(prev, unknowns, config.settings);
     if (due) {
-      alerts.push({ id: site.id, prev, message: undetectableMessage(site, unknowns, verdict.reason) });
+      problems.push({ kind: "illisible", id: site.id, prev, site, count: unknowns, detail: verdict.reason });
     }
 
     state.sites[site.id] = {
@@ -184,7 +186,18 @@ async function checkAll(sites, config, state, results, alerts) {
 }
 
 /** Heartbeat, envoi des alertes, sauvegarde de l'etat et ping du watchdog. */
-async function finish(config, sites, state, results, alerts) {
+async function finish(config, sites, state, results, alerts, problems) {
+  // Tous les problemes du passage tiennent dans une seule notification :
+  // un incident chez un marchand touche ses articles ensemble, et cinq
+  // messages pour une meme cause noient l alerte de stock qu on attend.
+  if (problems.length > 0) {
+    alerts.push({
+      ids: problems.map((p) => p.id),
+      prevs: problems.map((p) => p.prev),
+      message: problemsMessage(problems),
+    });
+  }
+
   const hb = config.settings.heartbeat_hours;
   const previousHeartbeat = state.lastHeartbeat;
   if (hb > 0 && isDue(state.lastHeartbeat, hb)) {
@@ -249,7 +262,11 @@ async function deliver(alerts, state, previousHeartbeat) {
       sent++;
     } catch (err) {
       failed.push(err.message);
-      if (alert.id) {
+      if (alert.ids) {
+        // Message groupe : chaque fiche retrouve son etat precedent, pour que
+        // l alerte soit rejouee au prochain passage.
+        alert.ids.forEach((id, i) => { state.sites[id] = alert.prevs[i]; });
+      } else if (alert.id) {
         state.sites[alert.id] = alert.prev;
       } else {
         state.lastHeartbeat = previousHeartbeat;
@@ -297,8 +314,8 @@ async function previewAlert(kind, send) {
   const samples = {
     stock: () => backInStockMessage(site, verdict),
     rupture: () => outOfStockMessage(site, { reason: 'schema.org availability = OutOfStock' }),
-    echec: () => errorMessage(site, 3, 'HTTP 403 Forbidden'),
-    illisible: () => undetectableMessage(site, 3, 'Aucun signal de disponibilite reconnu'),
+    echec: () => problemsMessage([{ kind: "echec", site, count: 12, detail: "HTTP 403 Forbidden" }]),
+    illisible: () => problemsMessage([{ kind: "illisible", site, count: 12, detail: "Aucun signal de disponibilite reconnu" }]),
     doute: () => backInStockMessage(site, { ...verdict, confidence: 'low', reason: 'Bouton panier actif' }),
   };
 

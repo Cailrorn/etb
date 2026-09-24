@@ -68,7 +68,7 @@ export function loadConfig(path = 'sites.yaml') {
       concurrency: globals.concurrency ?? 4,
       user_agent: globals.user_agent ?? null,
       heartbeat_hours: globals.heartbeat_hours ?? 24,
-      error_alert_after: globals.error_alert_after ?? 3,
+      error_alert_after: globals.error_alert_after ?? 12,
       ...globals,
     },
     sites: parsed.filter((s) => s.enabled !== false),

@@ -150,7 +150,7 @@ La comparaison de texte ignore la casse **et** les accents : `"épuisé"` corres
 settings:
   concurrency: 4          # sites vérifiés en parallèle
   heartbeat_hours: 24     # message "je suis vivant" toutes les 24h (0 = désactivé)
-  error_alert_after: 3    # alerte après N échecs consécutifs sur un site
+  error_alert_after: 12   # alerte après N passages en échec d'affilée (12 = 1 h)
 ```
 
 ---
@@ -198,13 +198,16 @@ cron GitHub Actions (toutes les 5 min)
 | Message | Déclencheur | Répétition |
 |---|---|---|
 | 🟢 **De nouveau en stock** | un article passe de rupture à disponible | à chaque retour en stock |
-| ⚠️ **Surveillance en échec** | 3 échecs réseau consécutifs sur un site | puis rappel toutes les 12 h tant que ça dure |
-| 🟠 **Site illisible** | 3 verdicts « indéterminé » consécutifs | puis rappel toutes les 12 h |
+| ⚠️ **Surveillance en difficulté** | une fiche échoue, reste illisible ou voit son témoin dévier pendant **12 passages d’affilée, soit 1 h** | puis rappel toutes les 12 h tant que ça dure |
 | 🔥 **Le robot a planté** | le job GitHub échoue avant de pouvoir vérifier | à chaque échec |
 | 💓 **Surveillance active** | toutes les 24 h, en silencieux | 1×/jour |
 | 🔴 **De nouveau indisponible** | retour en rupture | désactivé par défaut |
 
 Les alertes produit ne partent qu'aux **changements d'état** : tant que tout reste en rupture, aucun message.
+
+Les problèmes d'un même passage tiennent dans **une seule notification**, groupée par nature. Un incident chez un marchand touche ses articles en même temps — Carrefour en compte cinq — et autant de messages pour une seule cause finiraient par masquer la seule alerte qui compte, celle d'un retour en stock.
+
+Le seuil d'une heure vient du même constat : sur trois jours, les murs anti-bot de Carrefour et King Jouet ont produit **83 alertes de problème**, toutes pour des coupures qui se réglaient seules en quelques minutes. Une panne réelle, elle, dure et finit toujours par être signalée.
 
 ### Détecter que le robot ne tourne plus
 

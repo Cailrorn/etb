@@ -82,16 +82,57 @@ export function outOfStockMessage(site, result) {
   ].join('\n');
 }
 
-export function errorMessage(site, failures, lastError) {
-  return [
-    '⚠️ <b>Surveillance en echec</b>',
+/**
+ * Un seul message pour tous les problemes d'un passage.
+ *
+ * Un incident chez un marchand touche ses articles en meme temps : Carrefour
+ * en compte cinq. Une notification par fiche noyait le canal, au point de
+ * rendre invisible la seule qui compte, celle d'un retour en stock. Ici tout
+ * tient dans un message, groupe par nature de probleme.
+ */
+export function problemsMessage(problems) {
+  const lien = (p) => `<a href="${escapeHtml(p.site.url)}">${escapeHtml(p.site.name)}</a>`;
+  const echecs = problems.filter((p) => p.kind === 'echec');
+  const illisibles = problems.filter((p) => p.kind === 'illisible');
+  const temoins = problems.filter((p) => p.kind === 'temoin');
+
+  const lignes = [
+    `⚠️ <b>Surveillance en difficulte</b> — ${problems.length} fiche(s)`,
     '',
-    `<b>${escapeHtml(site.name)}</b>`,
-    `${failures} echecs consecutifs.`,
-    `Derniere erreur : <code>${escapeHtml(String(lastError).slice(0, 300))}</code>`,
-    '',
-    `<a href="${escapeHtml(site.url)}">Verifier la page manuellement</a>`,
-  ].join('\n');
+  ];
+
+  if (echecs.length > 0) {
+    lignes.push(`⚠️ <b>Surveillance en echec</b> (${echecs.length})`);
+    for (const p of echecs) {
+      lignes.push(`· ${lien(p)} — ${p.count} passages`);
+      lignes.push(`  <code>${escapeHtml(String(p.detail).slice(0, 160))}</code>`);
+    }
+    lignes.push('');
+  }
+
+  if (illisibles.length > 0) {
+    lignes.push(`🟠 <b>Site illisible</b> (${illisibles.length})`);
+    for (const p of illisibles) {
+      lignes.push(`· ${lien(p)} — ${p.count} passages : ${escapeHtml(p.detail)}`);
+    }
+    lignes.push('');
+  }
+
+  if (temoins.length > 0) {
+    lignes.push(`🧭 <b>DETECTION PEUT-ETRE CASSEE</b> (${temoins.length})`);
+    for (const p of temoins) {
+      lignes.push(`· ${lien(p)} — vu « ${escapeHtml(p.detail)} » depuis ${p.count} passages`);
+    }
+    lignes.push(
+      'Le temoin est cense rester disponible : soit ce produit est reellement',
+      'parti en rupture et il faut le remplacer, soit la detection ne fonctionne',
+      'plus chez ce marchand et aucun retour en stock n\'y sera signale.',
+      '',
+    );
+  }
+
+  lignes.push('Ces fiches ne signaleront pas de retour en stock tant que ce n\'est pas corrige.');
+  return lignes.join('\n');
 }
 
 export function heartbeatMessage(sites, results) {
@@ -122,42 +163,3 @@ export function heartbeatMessage(sites, results) {
 
 export { escapeHtml };
 
-export function undetectableMessage(site, count, reason) {
-  return [
-    '🟠 <b>Site illisible</b>',
-    '',
-    `<b>${escapeHtml(site.name)}</b>`,
-    `La page se charge mais la disponibilite n'est pas detectable (${count} passages).`,
-    `Motif : ${escapeHtml(reason)}`,
-    '',
-    'Ce site ne te previendra pas d\'un retour en stock tant que ce n\'est pas corrige.',
-    `<a href="${escapeHtml(site.url)}">Verifier la page manuellement</a>`,
-  ].join('\n');
-}
-
-/**
- * Un temoin de detection a cesse de repondre comme attendu.
- *
- * Ce message ne parle pas de stock mais de fiabilite : si la detection ne sait
- * plus dire "disponible" chez un marchand, aucun retour en stock n'y sera
- * jamais signale, et rien d'autre ne le ferait savoir.
- */
-export function canaryMessage(site, result, count) {
-  const etat = result.inStock === true ? 'disponible'
-    : result.inStock === false ? 'indisponible' : 'indetermine';
-
-  return [
-    '🧭 <b>DETECTION PEUT-ETRE CASSEE</b>',
-    '',
-    `Le temoin <b>${escapeHtml(site.name)}</b> devrait etre disponible en permanence.`,
-    `Il est vu « ${escapeHtml(etat)} » depuis ${count} passage(s).`,
-    '',
-    `Motif : ${escapeHtml(result.reason)}`,
-    '',
-    'Deux explications : ce produit temoin est reellement parti en rupture, et il',
-    'faut le remplacer ; ou la detection ne fonctionne plus chez ce marchand, et',
-    'aucun retour en stock n\'y sera signale.',
-    '',
-    `<a href="${escapeHtml(site.url)}">Verifier la page du temoin</a>`,
-  ].join('\n');
-}

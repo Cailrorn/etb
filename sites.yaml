@@ -14,7 +14,7 @@
 settings:
   concurrency: 4
   heartbeat_hours: 24     # message "je suis vivant" toutes les 24h (0 = désactivé)
-  error_alert_after: 3    # alerte après N échecs consécutifs sur un site
+  error_alert_after: 12   # alerte après N passages en échec d'affilée (12 = 1 h)
   error_repeat_hours: 12  # puis rappel toutes les N heures tant que ça dure
   timeout_ms: 30000
   retries: 2
@@ -67,7 +67,7 @@ sites:
     identity: "196214144835"
     mode: browser
     wait_ms: 8000
-    challenge_timeout_ms: 30000
+    challenge_timeout_ms: 45000
 
   # Testé OK : schema.org expose OutOfStock, aucune protection.
   - name: "JouéClub — ETB 30 ans"
@@ -144,7 +144,7 @@ sites:
     identity: "196214147225"
     mode: browser
     wait_ms: 8000
-    challenge_timeout_ms: 30000
+    challenge_timeout_ms: 45000
 
   # -------------------------------------------------------------------------
   # Coffret 4 boosters Nymphali-ex — EAN 196214147102
@@ -180,7 +180,7 @@ sites:
     identity: "196214147102"
     mode: browser
     wait_ms: 8000
-    challenge_timeout_ms: 30000
+    challenge_timeout_ms: 45000
 
   # Philibert n'expose aucune donnée schema.org et rend sa zone d'achat en JS :
   # mode navigateur obligatoire, avec une règle explicite.
@@ -222,7 +222,7 @@ sites:
     identity: "196214147164"
     mode: browser
     wait_ms: 8000
-    challenge_timeout_ms: 30000
+    challenge_timeout_ms: 45000
 
   # Voir la note sur Philibert plus haut (Coffret Nymphali).
   # -------------------------------------------------------------------------
@@ -411,7 +411,7 @@ sites:
     identity: "0746775036744"
     mode: browser
     wait_ms: 8000
-    challenge_timeout_ms: 30000
+    challenge_timeout_ms: 45000
     expect: in_stock
 
   # Témoin Cdiscount : cafetière Philips Senseo, produit de fond de catalogue.
@@ -456,7 +456,7 @@ sites:
     identity: "196214144835"
     mode: browser
     wait_ms: 7000
-    challenge_timeout_ms: 30000
+    challenge_timeout_ms: 45000
     in_stock_when:
       selector_exists: "#submitBasketAdd:not(.d-none)"
 
@@ -465,7 +465,7 @@ sites:
     identity: "196214147225"
     mode: browser
     wait_ms: 7000
-    challenge_timeout_ms: 30000
+    challenge_timeout_ms: 45000
     in_stock_when:
       selector_exists: "#submitBasketAdd:not(.d-none)"
 
@@ -474,7 +474,7 @@ sites:
     identity: "196214147102"
     mode: browser
     wait_ms: 7000
-    challenge_timeout_ms: 30000
+    challenge_timeout_ms: 45000
     in_stock_when:
       selector_exists: "#submitBasketAdd:not(.d-none)"
 
@@ -483,7 +483,7 @@ sites:
     identity: "196214147164"
     mode: browser
     wait_ms: 7000
-    challenge_timeout_ms: 30000
+    challenge_timeout_ms: 45000
     in_stock_when:
       selector_exists: "#submitBasketAdd:not(.d-none)"
 
@@ -494,7 +494,7 @@ sites:
     identity: "Protections Plastiques"
     mode: browser
     wait_ms: 7000
-    challenge_timeout_ms: 30000
+    challenge_timeout_ms: 45000
     expect: in_stock
     in_stock_when:
       selector_exists: "#submitBasketAdd:not(.d-none)"
