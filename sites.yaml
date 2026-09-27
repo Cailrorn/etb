@@ -302,9 +302,12 @@ sites:
       absent: ["Non disponible actuellement"]
 
   # Même règle explicite que les 2 articles Philibert.
+  # Uno : jeu de fond de catalogue, plus stable que le booster Pokémon utilisé
+  # jusqu au 2026-09-27, qui partait en rupture et faisait alerter le témoin
+  # alors que la détection allait bien.
   - name: "TÉMOIN Philibert"
-    url: "https://www.philibertnet.com/fr/pokemon/182164-pokemon-true-illusion-booster-6977321125771.html"
-    identity: "6977321125771"
+    url: "https://www.philibertnet.com/fr/mattel/5324-uno-746775036744.html"
+    identity: "746775036744"
     mode: browser
     wait_ms: 6000
     expect: in_stock
