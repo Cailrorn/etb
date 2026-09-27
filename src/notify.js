@@ -83,59 +83,15 @@ export function outOfStockMessage(site, result) {
 }
 
 /**
- * Un seul message pour tous les problemes d'un passage.
+ * Le message quotidien : etat des articles, sante des temoins, et resume des
+ * problemes rencontres depuis la veille.
  *
- * Un incident chez un marchand touche ses articles en meme temps : Carrefour
- * en compte cinq. Une notification par fiche noyait le canal, au point de
- * rendre invisible la seule qui compte, celle d'un retour en stock. Ici tout
- * tient dans un message, groupe par nature de probleme.
+ * Les problemes ne partent plus a chaud. Les murs anti-bot echouent par
+ * a-coups et se remettent seuls : alerter a chaud produisait des dizaines de
+ * notifications par jour, au risque de masquer la seule qui compte, celle d'un
+ * retour en stock. Ici tout tient dans un message par jour.
  */
-export function problemsMessage(problems) {
-  const lien = (p) => `<a href="${escapeHtml(p.site.url)}">${escapeHtml(p.site.name)}</a>`;
-  const echecs = problems.filter((p) => p.kind === 'echec');
-  const illisibles = problems.filter((p) => p.kind === 'illisible');
-  const temoins = problems.filter((p) => p.kind === 'temoin');
-
-  const lignes = [
-    `⚠️ <b>Surveillance en difficulte</b> — ${problems.length} fiche(s)`,
-    '',
-  ];
-
-  if (echecs.length > 0) {
-    lignes.push(`⚠️ <b>Surveillance en echec</b> (${echecs.length})`);
-    for (const p of echecs) {
-      lignes.push(`· ${lien(p)} — ${p.count} passages`);
-      lignes.push(`  <code>${escapeHtml(String(p.detail).slice(0, 160))}</code>`);
-    }
-    lignes.push('');
-  }
-
-  if (illisibles.length > 0) {
-    lignes.push(`🟠 <b>Site illisible</b> (${illisibles.length})`);
-    for (const p of illisibles) {
-      lignes.push(`· ${lien(p)} — ${p.count} passages : ${escapeHtml(p.detail)}`);
-    }
-    lignes.push('');
-  }
-
-  if (temoins.length > 0) {
-    lignes.push(`🧭 <b>DETECTION PEUT-ETRE CASSEE</b> (${temoins.length})`);
-    for (const p of temoins) {
-      lignes.push(`· ${lien(p)} — vu « ${escapeHtml(p.detail)} » depuis ${p.count} passages`);
-    }
-    lignes.push(
-      'Le temoin est cense rester disponible : soit ce produit est reellement',
-      'parti en rupture et il faut le remplacer, soit la detection ne fonctionne',
-      'plus chez ce marchand et aucun retour en stock n\'y sera signale.',
-      '',
-    );
-  }
-
-  lignes.push('Ces fiches ne signaleront pas de retour en stock tant que ce n\'est pas corrige.');
-  return lignes.join('\n');
-}
-
-export function heartbeatMessage(sites, results) {
+export function heartbeatMessage(sites, results, problems = []) {
   const articles = sites.filter((s) => !s.expect);
   const temoins = sites.filter((s) => s.expect);
 
@@ -158,7 +114,50 @@ export function heartbeatMessage(sites, results) {
     }
   }
 
+  lines.push('', ...problemLines(problems));
   return lines.join('\n');
+}
+
+/**
+ * Resume des problemes du jour, separes selon ce qu'ils demandent.
+ *
+ * Une fiche encore en panne au moment du resume reclame une action : c'est
+ * elle qui ne signalera pas un retour en stock. Une fiche rentree dans l'ordre
+ * n'est la que pour information, et ne merite pas qu'on s'y attarde.
+ */
+function problemLines(problems) {
+  if (problems.length === 0) {
+    return ['<i>✅ Aucune erreur depuis le dernier resume.</i>'];
+  }
+
+  const encore = problems.filter((p) => p.ongoing);
+  const passes = problems.filter((p) => !p.ongoing);
+  const lignes = [`⚠️ <b>Erreurs depuis le dernier resume</b> — ${problems.length} fiche(s)`];
+  const lien = (p) => `<a href="${escapeHtml(p.url)}">${escapeHtml(p.name)}</a>`;
+
+  if (encore.length > 0) {
+    lignes.push('', `<b>Toujours en panne (${encore.length})</b> — a corriger :`);
+    for (const p of encore) {
+      lignes.push(`· ${lien(p)} — ${describe(p)}`);
+      lignes.push(`  <code>${escapeHtml(String(p.detail).slice(0, 160))}</code>`);
+    }
+  }
+
+  if (passes.length > 0) {
+    lignes.push('', `<i>Rentre dans l'ordre (${passes.length}), pour information :</i>`);
+    for (const p of passes) {
+      lignes.push(`<i>· ${escapeHtml(p.name)} — ${describe(p)}</i>`);
+    }
+  }
+
+  return lignes;
+}
+
+function describe(p) {
+  const nature = p.kind === 'illisible' ? 'illisible'
+    : p.kind === 'temoin' ? 'temoin non conforme'
+      : 'echec';
+  return `${nature}, ${p.passes} passage(s)`;
 }
 
 export { escapeHtml };

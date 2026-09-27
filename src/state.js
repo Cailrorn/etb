@@ -21,5 +21,6 @@ export function saveState(state, path = 'state.json') {
 export function siteState(state, id) {
   return state.sites[id] ?? {
     inStock: null, since: null, failures: 0, unknowns: 0, lastError: null, lastCheck: null,
+    journal: null,
   };
 }

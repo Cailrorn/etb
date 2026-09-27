@@ -4,7 +4,7 @@ import { fetchSite, closeBrowser } from './fetchers.js';
 import { detect } from './detect.js';
 import { loadState, saveState, siteState } from './state.js';
 import {
-  sendTelegram, backInStockMessage, outOfStockMessage, problemsMessage, heartbeatMessage,
+  sendTelegram, backInStockMessage, outOfStockMessage, heartbeatMessage,
 } from './notify.js';
 
 const args = new Set(process.argv.slice(2));
@@ -43,12 +43,11 @@ async function main() {
   const state = loadState(STATE_PATH);
   const results = new Map();
   const alerts = [];
-  const problems = [];
 
   log(`Verification de ${sites.length} article(s)${DRY_RUN ? ' [dry-run]' : ''}…\n`);
 
   try {
-    await checkAll(sites, config, state, results, alerts, problems);
+    await checkAll(sites, config, state, results, alerts);
   } finally {
     // Sans cette fermeture, le processus resterait vivant apres le dernier site.
     await closeBrowser();
@@ -58,7 +57,7 @@ async function main() {
   // seraient pris pour des orphelins et leur historique efface.
   if (!only) pruneOrphans(state, config.sites);
 
-  await finish(config, sites, state, results, alerts, problems);
+  await finish(config, sites, state, results, alerts);
 }
 
 /**
@@ -80,7 +79,7 @@ function pruneOrphans(state, activeSites) {
   return orphans;
 }
 
-async function checkAll(sites, config, state, results, alerts, problems) {
+async function checkAll(sites, config, state, results, alerts) {
   await runPool(sites, config.settings.concurrency, async (site) => {
     const prev = siteState(state, site.id);
     let result;
@@ -94,17 +93,12 @@ async function checkAll(sites, config, state, results, alerts, problems) {
       // On laisse passer les coupures breves, puis on alerte et on rappelle
       // regulierement tant que le site reste casse : une alerte unique se
       // perdrait dans l'historique et le site resterait aveugle sans le dire.
-      const due = problemAlertDue(prev, failures, config.settings);
-      if (due) {
-        problems.push({ kind: "echec", id: site.id, prev, site, count: failures, detail: err.message });
-      }
-
       state.sites[site.id] = {
         ...prev,
         failures,
         lastError: String(err.message),
         lastCheck: nowIso(),
-        lastProblemAlert: due ? nowIso() : prev.lastProblemAlert ?? null,
+        journal: noteProblem(prev, site, 'echec', err.message),
       };
       return;
     }
@@ -125,13 +119,9 @@ async function checkAll(sites, config, state, results, alerts, problems) {
       const attendu = site.expect === 'in_stock';
       const conforme = verdict.inStock === attendu;
       const ecarts = conforme ? 0 : (prev.mismatches ?? 0) + 1;
-      const due = !conforme && problemAlertDue(prev, ecarts, config.settings);
 
-      if (due) {
-        const etat = verdict.inStock === true ? "disponible"
-          : verdict.inStock === false ? "indisponible" : "indetermine";
-        problems.push({ kind: "temoin", id: site.id, prev, site, count: ecarts, detail: etat });
-      }
+      const etat = verdict.inStock === true ? 'disponible'
+        : verdict.inStock === false ? 'indisponible' : 'indetermine';
 
       state.sites[site.id] = {
         ...prev,
@@ -143,7 +133,7 @@ async function checkAll(sites, config, state, results, alerts, problems) {
         lastCheck: nowIso(),
         lastReason: verdict.reason,
         confidence: verdict.confidence,
-        lastProblemAlert: due ? nowIso() : ecarts > 0 ? prev.lastProblemAlert ?? null : null,
+        journal: conforme ? prev.journal ?? null : noteProblem(prev, site, 'temoin', etat),
         url: site.url,
       };
       return;
@@ -165,10 +155,6 @@ async function checkAll(sites, config, state, results, alerts, problems) {
     // Un verdict "indetermine" ne casse rien et n'alerte rien : c'est un angle
     // mort. On le compte pour finir par le signaler, comme une panne.
     const unknowns = verdict.inStock === null ? (prev.unknowns ?? 0) + 1 : 0;
-    const due = unknowns > 0 && problemAlertDue(prev, unknowns, config.settings);
-    if (due) {
-      problems.push({ kind: "illisible", id: site.id, prev, site, count: unknowns, detail: verdict.reason });
-    }
 
     state.sites[site.id] = {
       inStock: verdict.inStock,
@@ -179,29 +165,73 @@ async function checkAll(sites, config, state, results, alerts, problems) {
       lastCheck: nowIso(),
       lastReason: verdict.reason,
       confidence: verdict.confidence,
-      lastProblemAlert: due ? nowIso() : unknowns > 0 ? prev.lastProblemAlert ?? null : null,
+      journal: unknowns > 0 ? noteProblem(prev, site, 'illisible', verdict.reason) : prev.journal ?? null,
       url: site.url,
     };
   });
 }
 
-/** Heartbeat, envoi des alertes, sauvegarde de l'etat et ping du watchdog. */
-async function finish(config, sites, state, results, alerts, problems) {
-  // Tous les problemes du passage tiennent dans une seule notification :
-  // un incident chez un marchand touche ses articles ensemble, et cinq
-  // messages pour une meme cause noient l alerte de stock qu on attend.
-  if (problems.length > 0) {
-    alerts.push({
-      ids: problems.map((p) => p.id),
-      prevs: problems.map((p) => p.prev),
-      message: problemsMessage(problems),
-    });
-  }
+/**
+ * Enregistre un probleme dans le journal de la fiche, sans rien notifier.
+ *
+ * On garde le nombre de passages touches et la derniere cause : c'est ce que
+ * le resume quotidien raconte. Un probleme qui se repare seul reste donc
+ * visible une fois par jour, mais ne reveille personne.
+ */
+function noteProblem(prev, site, kind, detail) {
+  const journal = prev.journal ?? { passes: 0 };
+  return {
+    passes: journal.passes + 1,
+    kind,
+    detail: String(detail).slice(0, 300),
+    first: journal.first ?? nowIso(),
+    last: nowIso(),
+  };
+}
 
+/** Les fiches ayant connu un probleme depuis le dernier resume. */
+function collectProblems(state, sites) {
+  // Le nom et l'URL viennent de la configuration : l'etat ne les porte pas
+  // pour toutes les fiches, et une fiche en echec n'a jamais rien pu ecrire.
+  const connus = new Map(sites.map((s) => [s.id, s]));
+
+  return Object.entries(state.sites)
+    .filter(([id, v]) => v.journal?.passes > 0 && connus.has(id))
+    .map(([id, v]) => ({
+      id,
+      name: connus.get(id).name,
+      url: connus.get(id).url,
+      kind: v.journal.kind,
+      detail: v.journal.detail,
+      passes: v.journal.passes,
+      // Encore en panne au moment du resume : c'est ce qui reclame une action.
+      ongoing: (v.failures ?? 0) > 0 || (v.unknowns ?? 0) > 0 || (v.mismatches ?? 0) > 0,
+    }))
+    .sort((a, b) => Number(b.ongoing) - Number(a.ongoing) || b.passes - a.passes);
+}
+
+/** Heartbeat, envoi des alertes, sauvegarde de l'etat et ping du watchdog. */
+async function finish(config, sites, state, results, alerts) {
   const hb = config.settings.heartbeat_hours;
   const previousHeartbeat = state.lastHeartbeat;
   if (hb > 0 && isDue(state.lastHeartbeat, hb)) {
-    alerts.push({ id: null, message: heartbeatMessage(sites, results) });
+    // Le resume des erreurs voyage avec ce message : une seule notification
+    // par jour, qu'il y ait eu des problemes ou non.
+    const problems = collectProblems(state, sites);
+    const journaux = problems.map((p) => [p.id, state.sites[p.id].journal]);
+
+    alerts.push({
+      message: heartbeatMessage(sites, results, problems),
+      silent: problems.every((p) => !p.ongoing),
+      rollback: () => {
+        state.lastHeartbeat = previousHeartbeat;
+        for (const [id, journal] of journaux) state.sites[id].journal = journal;
+      },
+    });
+
+    // Le compteur repart a zero : le prochain resume ne parlera que de ce qui
+    // s'est passe depuis celui-ci.
+    for (const [id] of journaux) state.sites[id].journal = null;
     state.lastHeartbeat = nowIso();
   }
 
@@ -258,19 +288,15 @@ async function deliver(alerts, state, previousHeartbeat) {
 
   for (const alert of alerts) {
     try {
-      await sendTelegram(alert.message, { silent: alert.message.startsWith('💓') });
+      await sendTelegram(alert.message, { silent: alert.silent ?? false });
       sent++;
     } catch (err) {
       failed.push(err.message);
-      if (alert.ids) {
-        // Message groupe : chaque fiche retrouve son etat precedent, pour que
-        // l alerte soit rejouee au prochain passage.
-        alert.ids.forEach((id, i) => { state.sites[id] = alert.prevs[i]; });
-      } else if (alert.id) {
-        state.sites[alert.id] = alert.prev;
-      } else {
-        state.lastHeartbeat = previousHeartbeat;
-      }
+      // Chaque alerte sait defaire ce qu'elle a marque comme notifie : sans
+      // cela, une panne de Telegram ferait manquer definitivement un retour
+      // en stock, deja enregistre mais jamais annonce.
+      if (alert.rollback) alert.rollback();
+      else if (alert.id) state.sites[alert.id] = alert.prev;
     }
   }
 
@@ -280,19 +306,6 @@ async function deliver(alerts, state, previousHeartbeat) {
     console.error(`Cause : ${failed[0]}`);
     process.exitCode = 1;
   }
-}
-
-/**
- * Faut-il (re)signaler qu'un site est en panne ?
- * Oui au franchissement du seuil, puis a intervalle regulier tant que dure le
- * probleme. Sinon une panne installee ne serait signalee qu'une fois, le
- * premier jour, et passerait ensuite inapercue.
- */
-function problemAlertDue(prev, count, settings) {
-  if (count < settings.error_alert_after) return false;
-  if (!prev.lastProblemAlert) return true;
-  const repeatMs = (settings.error_repeat_hours ?? 12) * 3600_000;
-  return Date.now() - new Date(prev.lastProblemAlert).getTime() >= repeatMs;
 }
 
 /**
@@ -314,8 +327,16 @@ async function previewAlert(kind, send) {
   const samples = {
     stock: () => backInStockMessage(site, verdict),
     rupture: () => outOfStockMessage(site, { reason: 'schema.org availability = OutOfStock' }),
-    echec: () => problemsMessage([{ kind: "echec", site, count: 12, detail: "HTTP 403 Forbidden" }]),
-    illisible: () => problemsMessage([{ kind: "illisible", site, count: 12, detail: "Aucun signal de disponibilite reconnu" }]),
+    resume: () => heartbeatMessage(
+      [site, { id: 'temoin', name: 'TEMOIN Carrefour', url: site.url, expect: 'in_stock' }],
+      new Map([[site.id, { inStock: false }], ['temoin', { inStock: true }]]),
+      [
+        { id: 'a', name: 'Carrefour — ETB 30 ans', url: site.url, kind: 'echec', passes: 9, ongoing: true,
+          detail: 'Challenge anti-bot non resolu (page de verification affichee).' },
+        { id: 'b', name: 'Au Demon du Jeu — Coffret Poster', url: site.url, kind: 'echec', passes: 3, ongoing: false,
+          detail: 'Fiche produit introuvable' },
+      ],
+    ),
     doute: () => backInStockMessage(site, { ...verdict, confidence: 'low', reason: 'Bouton panier actif' }),
   };
 

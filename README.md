@@ -149,8 +149,7 @@ La comparaison de texte ignore la casse **et** les accents : `"épuisé"` corres
 ```yaml
 settings:
   concurrency: 4          # sites vérifiés en parallèle
-  heartbeat_hours: 24     # message "je suis vivant" toutes les 24h (0 = désactivé)
-  error_alert_after: 12   # alerte après N passages en échec d'affilée (12 = 1 h)
+  heartbeat_hours: 24     # message quotidien : état + résumé des erreurs (0 = désactivé)
 ```
 
 ---
@@ -198,16 +197,28 @@ cron GitHub Actions (toutes les 5 min)
 | Message | Déclencheur | Répétition |
 |---|---|---|
 | 🟢 **De nouveau en stock** | un article passe de rupture à disponible | à chaque retour en stock |
-| ⚠️ **Surveillance en difficulté** | une fiche échoue, reste illisible ou voit son témoin dévier pendant **12 passages d’affilée, soit 1 h** | puis rappel toutes les 12 h tant que ça dure |
 | 🔥 **Le robot a planté** | le job GitHub échoue avant de pouvoir vérifier | à chaque échec |
-| 💓 **Surveillance active** | toutes les 24 h, en silencieux | 1×/jour |
+| 💓 **Surveillance active** | toutes les 24 h : état de chaque article, santé des témoins, **et le résumé des erreurs de la journée** | 1×/jour |
 | 🔴 **De nouveau indisponible** | retour en rupture | désactivé par défaut |
 
 Les alertes produit ne partent qu'aux **changements d'état** : tant que tout reste en rupture, aucun message.
 
-Les problèmes d'un même passage tiennent dans **une seule notification**, groupée par nature. Un incident chez un marchand touche ses articles en même temps — Carrefour en compte cinq — et autant de messages pour une seule cause finiraient par masquer la seule alerte qui compte, celle d'un retour en stock.
+### Les erreurs ne réveillent personne
 
-Le seuil d'une heure vient du même constat : sur trois jours, les murs anti-bot de Carrefour et King Jouet ont produit **83 alertes de problème**, toutes pour des coupures qui se réglaient seules en quelques minutes. Une panne réelle, elle, dure et finit toujours par être signalée.
+Les erreurs ne partent plus à chaud : elles sont **journalisées par fiche** puis racontées **une fois par jour**, dans le message « Surveillance active ». Une seule notification, donc, qu'il y ait eu un problème ou non.
+
+Ce choix vient d'un constat : sur trois jours, les murs anti-bot de Carrefour et King Jouet ont produit **83 alertes**, toutes pour des coupures qui se réglaient seules en quelques minutes. À ce rythme, la seule notification qui compte — un retour en stock — finissait noyée.
+
+Le résumé sépare deux cas :
+
+| Section | Ce qu'elle contient | Ce qu'elle demande |
+|---|---|---|
+| **Toujours en panne** | la fiche échoue encore au moment du résumé | à corriger : elle ne signalera pas de retour en stock |
+| **Rentré dans l'ordre** | la fiche a échoué puis s'est remise seule | rien, c'est pour information |
+
+Chaque ligne indique la nature du problème, le nombre de passages touchés et la dernière cause. Le message reste **silencieux** quand tout est rentré dans l'ordre, et sonne quand une fiche est encore en panne.
+
+Voir le résumé sans attendre : `node src/index.js --preview-alert=resume`.
 
 ### Détecter que le robot ne tourne plus
 

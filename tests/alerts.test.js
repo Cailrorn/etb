@@ -22,11 +22,9 @@ function run(config, state) {
   return { out, state: JSON.parse(readFileSync(statePath, 'utf8')) };
 }
 
-const CONFIG = `
+const INJOIGNABLE = `
 settings:
-  heartbeat_hours: 0
-  error_alert_after: 3
-  error_repeat_hours: 12
+  heartbeat_hours: 24
   retries: 0
 sites:
   - name: "Site injoignable"
@@ -34,31 +32,84 @@ sites:
     mode: http
 `;
 
-const siteState = (o) => ({ version: 1, lastHeartbeat: null, sites: { 'site-injoignable': o } });
+const SANS_RESUME = INJOIGNABLE.replace('heartbeat_hours: 24', 'heartbeat_hours: 0');
 
-test('aucune alerte avant le seuil d echecs', () => {
-  const { out, state } = run(CONFIG, siteState({ inStock: null, failures: 1, lastProblemAlert: null }));
-  assert.equal(out.includes('Aucun changement'), true);
-  assert.equal(state.sites['site-injoignable'].failures, 2);
+const siteState = (o, lastHeartbeat = null) =>
+  ({ version: 1, lastHeartbeat, sites: { 'site-injoignable': o } });
+
+const recent = () => new Date(Date.now() - 3600_000).toISOString();
+
+test('un echec ne notifie rien sur le moment, mais est journalise', () => {
+  // Les murs anti-bot echouent par a-coups et se remettent seuls : alerter a
+  // chaud produisait des dizaines de messages par jour.
+  const { out, state } = run(SANS_RESUME, siteState({ inStock: null, failures: 1 }));
+  assert.match(out, /Aucun changement/);
+  const apres = state.sites['site-injoignable'];
+  assert.equal(apres.failures, 2);
+  assert.equal(apres.journal.passes, 1, 'le probleme doit etre garde pour le resume');
 });
 
-test('alerte au franchissement du seuil', () => {
-  const { out, state } = run(CONFIG, siteState({ inStock: null, failures: 2, lastProblemAlert: null }));
-  assert.match(out, /Surveillance en echec/);
-  assert.equal(state.sites['site-injoignable'].failures, 3);
-  assert.notEqual(state.sites['site-injoignable'].lastProblemAlert, null);
+test('les echecs s accumulent dans le journal sans notifier', () => {
+  const { out, state } = run(SANS_RESUME,
+    siteState({ inStock: null, failures: 8, journal: { passes: 8, kind: 'echec', detail: 'x' } }));
+  assert.equal(out.includes('Erreurs depuis le dernier resume'), false);
+  assert.equal(state.sites['site-injoignable'].journal.passes, 9);
 });
 
-test('pas de rappel avant l intervalle, pour ne pas spammer', () => {
-  const recent = new Date(Date.now() - 60_000).toISOString();
-  const { out } = run(CONFIG, siteState({ inStock: null, failures: 9, lastProblemAlert: recent }));
-  assert.equal(out.includes('Surveillance en echec'), false);
+test('le resume quotidien porte les erreurs et vide le journal', () => {
+  const { out, state } = run(INJOIGNABLE,
+    siteState({ inStock: null, failures: 4, journal: { passes: 4, kind: 'echec', detail: 'ECONNREFUSED' } }));
+  assert.match(out, /Surveillance active/);
+  assert.match(out, /Erreurs depuis le dernier resume/);
+  assert.match(out, /Toujours en panne/);
+  assert.match(out, /Site injoignable/);
+  assert.equal(state.sites['site-injoignable'].journal, null, 'le journal repart de zero');
+  assert.notEqual(state.lastHeartbeat, null);
 });
 
-test('rappel une fois l intervalle ecoule : une panne installee ne s oublie pas', () => {
-  const old = new Date(Date.now() - 13 * 3600_000).toISOString();
-  const { out } = run(CONFIG, siteState({ inStock: null, failures: 40, lastProblemAlert: old }));
-  assert.match(out, /Surveillance en echec/);
+test('pas de second resume avant 24 h', () => {
+  const { out } = run(INJOIGNABLE,
+    siteState({ inStock: null, failures: 4, journal: { passes: 4, kind: 'echec', detail: 'x' } }, recent()));
+  assert.equal(out.includes('Surveillance active'), false);
+  assert.match(out, /Aucun changement/);
+});
+
+test('une panne reparee est signalee pour information, pas comme a corriger', () => {
+  // Le site repond de nouveau : ses echecs de la journee restent visibles une
+  // fois, sans laisser croire qu'il y a quelque chose a faire.
+  const config = `
+settings:
+  heartbeat_hours: 24
+  retries: 0
+sites:
+  - name: "Livre en stock"
+    url: "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
+    mode: http
+    in_stock_when:
+      present: ["In stock"]
+`;
+  const { out } = run(config, {
+    version: 1, lastHeartbeat: null,
+    sites: { 'livre-en-stock': { inStock: true, failures: 0, journal: { passes: 3, kind: 'echec', detail: 'HTTP 503' } } },
+  });
+  assert.match(out, /Rentre dans l'ordre/);
+  assert.equal(out.includes('Toujours en panne'), false);
+});
+
+test('un resume sans aucune erreur le dit explicitement', () => {
+  const config = `
+settings:
+  heartbeat_hours: 24
+  retries: 0
+sites:
+  - name: "Livre en stock"
+    url: "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
+    mode: http
+    in_stock_when:
+      present: ["In stock"]
+`;
+  const { out } = run(config, { version: 1, lastHeartbeat: null, sites: {} });
+  assert.match(out, /Aucune erreur depuis le dernier resume/);
 });
 
 test('l apercu n envoie rien sans --send', () => {
@@ -139,9 +190,7 @@ test('--only ne purge pas les autres sites', () => {
 
 const TEMOIN = `
 settings:
-  heartbeat_hours: 0
-  error_alert_after: 3
-  error_repeat_hours: 12
+  heartbeat_hours: 24
   retries: 0
 sites:
   - name: "Temoin livre"
@@ -158,27 +207,31 @@ const etatTemoin = (o) => ({ version: 1, lastHeartbeat: null, sites: { 'temoin-l
 test('un temoin conforme n envoie aucune alerte d achat', () => {
   // Le temoin est disponible en permanence : sans traitement particulier, il
   // declencherait une alerte "de nouveau en stock" a chaque nouvelle install.
-  const { out, state } = run(TEMOIN, etatTemoin({ inStock: null, failures: 0 }));
+  const { out, state } = run(TEMOIN.replace('heartbeat_hours: 24', 'heartbeat_hours: 0'),
+    etatTemoin({ inStock: null, failures: 0 }));
   assert.equal(out.includes('EN STOCK'), true, 'il doit bien etre vu disponible');
   assert.equal(out.includes('DE NOUVEAU EN STOCK'), false, 'mais ne jamais alerter');
   assert.match(out, /Aucun changement/);
   assert.equal(state.sites['temoin-livre'].mismatches, 0);
 });
 
-test('un temoin qui cesse d etre disponible finit par alerter', () => {
+test('un temoin devie est signale dans le resume quotidien', () => {
   // Regle volontairement cassee : c'est la panne silencieuse qu'on veut voir.
-  const { out } = run(TEMOIN_CASSE, etatTemoin({ inStock: true, mismatches: 2, lastProblemAlert: null }));
-  assert.match(out, /DETECTION PEUT-ETRE CASSEE/);
+  const { out } = run(TEMOIN_CASSE, etatTemoin({ inStock: true, mismatches: 2 }));
+  assert.match(out, /temoin non conforme/);
+  assert.match(out, /Toujours en panne/);
 });
 
-test('un temoin casse n alerte pas avant le seuil', () => {
-  const { out, state } = run(TEMOIN_CASSE, etatTemoin({ inStock: true, mismatches: 0, lastProblemAlert: null }));
-  assert.equal(out.includes('DETECTION PEUT-ETRE CASSEE'), false);
+test('un temoin devie ne notifie rien hors du resume', () => {
+  const { out, state } = run(TEMOIN_CASSE.replace('heartbeat_hours: 24', 'heartbeat_hours: 0'),
+    etatTemoin({ inStock: true, mismatches: 0 }));
+  assert.match(out, /Aucun changement/);
   assert.equal(state.sites['temoin-livre'].mismatches, 1);
+  assert.equal(state.sites['temoin-livre'].journal.kind, 'temoin');
 });
 
 test('un temoin redevenu conforme remet son compteur a zero', () => {
-  const { state } = run(TEMOIN, etatTemoin({ inStock: false, mismatches: 7, lastProblemAlert: new Date().toISOString() }));
+  const { state } = run(TEMOIN, etatTemoin({ inStock: false, mismatches: 7 }));
   assert.equal(state.sites['temoin-livre'].mismatches, 0);
 });
 
@@ -186,9 +239,7 @@ test('un temoin redevenu conforme remet son compteur a zero', () => {
 
 const TROIS_SITES = `
 settings:
-  heartbeat_hours: 0
-  error_alert_after: 3
-  error_repeat_hours: 12
+  heartbeat_hours: 24
   retries: 0
 sites:
   - name: "Marchand A — article 1"
@@ -206,26 +257,17 @@ test('un incident touchant plusieurs fiches ne fait qu une notification', () => 
   // Cas reel : une panne chez un marchand donnait autant de messages qu'il a
   // d'articles surveilles. Cinq notifications pour une seule cause noient
   // l'alerte de stock qu'on attend vraiment.
+  const journal = (n) => ({ inStock: null, failures: n, journal: { passes: n, kind: 'echec', detail: 'x' } });
   const etat = {
     version: 1, lastHeartbeat: null,
     sites: {
-      'marchand-a-article-1': { inStock: null, failures: 2, lastProblemAlert: null },
-      'marchand-a-article-2': { inStock: null, failures: 2, lastProblemAlert: null },
-      'marchand-a-article-3': { inStock: null, failures: 2, lastProblemAlert: null },
+      'marchand-a-article-1': journal(2),
+      'marchand-a-article-2': journal(2),
+      'marchand-a-article-3': journal(2),
     },
   };
   const { out } = run(TROIS_SITES, etat);
-  assert.equal(out.match(/Surveillance en difficulte/g).length, 1, 'un seul message');
+  assert.equal(out.match(/Erreurs depuis le dernier resume/g).length, 1, 'un seul message');
   assert.match(out, /3 fiche\(s\)/);
   for (const n of ['article 1', 'article 2', 'article 3']) assert.match(out, new RegExp(n));
-});
-
-test('le seuil par defaut laisse passer une coupure d un quart d heure', async () => {
-  // Les murs anti-bot echouent par a-coups puis se remettent seuls. Alerter
-  // au bout de 3 passages produisait des dizaines de messages pour rien ;
-  // 12 passages, soit une heure, ne retiennent que les pannes installees.
-  const { loadConfig } = await import('../src/config.js');
-  const cfgPath = join(dir, 'seuil.yaml');
-  writeFileSync(cfgPath, 'sites:\n  - name: "X"\n    url: "https://exemple.fr/p"\n');
-  assert.equal(loadConfig(cfgPath).settings.error_alert_after, 12);
 });
